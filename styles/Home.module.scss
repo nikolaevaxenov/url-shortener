@@ -1,0 +1,78 @@
+@import "./colors.module.scss";
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  height: 100%;
+
+  &__title {
+    font-size: 5.5rem;
+    font-weight: 900;
+
+    background: $title-color;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    margin: 2rem;
+  }
+
+  &__subText {
+    font-size: 3rem;
+    font-weight: 900;
+    letter-spacing: 0.3rem;
+    text-align: center;
+
+    margin: 2rem;
+  }
+
+  &__inputGroup {
+    position: relative;
+    display: inline-block;
+
+    width: 20rem;
+
+    @media only screen and (min-width: 768px) {
+      width: 60%;
+    }
+  }
+
+  &__urlInput {
+    background: lighten($navbar-bg, 10%);
+    border: 0;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    color: $navbar-text;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $navbar-text;
+    }
+  }
+
+  &__urlButton {
+    background: $title-color;
+    border: 0;
+    border-radius: 7px;
+    color: lighten($navbar-bg, 10%);
+    padding: 15px;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+
+    cursor: pointer;
+  }
+
+  &__adText {
+    margin-top: 4rem;
+
+    font-size: 1rem;
+    font-weight: 400;
+    text-align: center;
+  }
+}
