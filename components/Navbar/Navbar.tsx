@@ -1,7 +1,10 @@
 import Link from "next/link";
+import { useUser } from "@auth0/nextjs-auth0";
 import styles from "./Navbar.module.scss";
 
 export default function Navbar() {
+  const { user, error, isLoading } = useUser();
+
   return (
     <header>
       <nav className={styles.navbar}>
@@ -11,12 +14,24 @@ export default function Navbar() {
           </Link>
         </div>
         <div className={styles.navbar__links}>
-          <Link href="/login">
-            <a className={styles.navbar__link}>Войти</a>
-          </Link>
-          <Link href="/signup">
-            <a className={styles.navbar__link}>Зарегистрироваться</a>
-          </Link>
+          {user ? (
+            <>
+              <Link href="/profile">
+                <a className={styles.navbar__link}>{user.email}</a>
+              </Link>
+              <Link href="/api/auth/logout">
+                <a className={styles.navbar__link}>Выйти</a>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/api/auth/login">
+                <a className={styles.navbar__link}>
+                  Войти / Зарегистрироваться
+                </a>
+              </Link>
+            </>
+          )}
         </div>
       </nav>
     </header>
