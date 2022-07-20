@@ -10,7 +10,7 @@ const Home: NextPage = () => {
       </Head>
       <main className={styles.main}>
         <p className={styles.main__title}>GoShort</p>
-        <p className={styles.main__subText}>простой сокращатель ссылок</p>
+        <p className={styles.main__subText}>сервис сокращения ссылок</p>
         <div className={styles.main__inputGroup}>
           <input
             type="url"
