@@ -1,0 +1,40 @@
+@import "./colors.module.scss";
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 20rem 1fr;
+
+  height: 100%;
+
+  &__leftSide {
+    display: flex;
+    overflow: auto;
+
+    flex-direction: column;
+  }
+
+  &__rightSide {
+    overflow: auto;
+  }
+
+  &__linkCount {
+    text-align: center;
+  }
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+
+    &__leftSide {
+      flex-direction: row;
+    }
+
+    &__linkCount {
+      display: none;
+    }
+
+    &__linkCard {
+      width: 20rem;
+    }
+  }
+}
