@@ -1,5 +1,5 @@
 export default interface ILink {
-  id: string;
+  _id: string;
   shortLink: string;
   fullLink: string;
   expiryDate: string;
