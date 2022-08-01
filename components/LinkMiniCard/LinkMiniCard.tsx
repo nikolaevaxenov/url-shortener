@@ -1,4 +1,4 @@
-import ILink from "../../interfaces/link.ts";
+import ILink from "../../interfaces/link";
 import styles from "./LinkMiniCard.module.scss";
 
 type LinkMiniCardProps = {
