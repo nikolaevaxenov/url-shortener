@@ -1,0 +1,34 @@
+.wrapper {
+  background: #f8f9fa;
+  border-radius: 30px;
+
+  padding: 0.1rem 1rem;
+  margin: 1rem;
+
+  p {
+    width: 100%;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  &__shortLink {
+    font-size: 1.3rem;
+  }
+
+  &__fullLink {
+    color: lighten(black, 30%);
+    font-size: 0.8rem;
+  }
+
+  &__createdAt {
+    color: lighten(black, 30%);
+    font-size: 0.8rem;
+  }
+
+  &:hover {
+    background: darken(#f8f9fa, 10%);
+    cursor: pointer;
+  }
+}
