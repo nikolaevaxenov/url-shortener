@@ -51,7 +51,22 @@ export default function LinkCard({ link }: LinkCardProps) {
     });
 
     const result = await res.json();
-    console.log("Result = ", result);
+  };
+
+  const validateLink = async (shortLink: string) => {
+    const usedWords = ["profile"];
+
+    const res = await fetch(`/api/links/${shortLink}`, {
+      method: "get",
+    });
+
+    const result = await res.json();
+
+    if (usedWords.includes(shortLink) || result !== null) {
+      return "Указанная короткая ссылка уже существует";
+    } else {
+      return true;
+    }
   };
 
   const onSubmit: SubmitHandler<FormInput> = (data) => {
@@ -132,6 +147,7 @@ export default function LinkCard({ link }: LinkCardProps) {
                 message:
                   "Ссылка должна содержать только цифры и латинские буквы",
               },
+              validate: (newShortLink) => validateLink(newShortLink),
             })}
           />
 
