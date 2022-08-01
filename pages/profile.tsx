@@ -36,7 +36,17 @@ const Profile: NextPage<ProfileProps> = ({ links }: ProfileProps) => {
         </div>
         <div className={styles.wrapper__rightSide}>
           {idCard !== "null" && (
-            <LinkCard link={links.find((link) => link._id === idCard)} />
+            <LinkCard
+              link={
+                links.find((link) => link._id === idCard) ?? {
+                  _id: "lorem",
+                  shortLink: "lorem",
+                  fullLink: "lorem",
+                  expiryDate: "lorem",
+                  createdAt: "lorem",
+                }
+              }
+            />
           )}
         </div>
       </main>
