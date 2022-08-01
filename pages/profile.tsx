@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 import styles from "../styles/Profile.module.scss";
-import ILink from "../interfaces/link.ts";
+import ILink from "../interfaces/link";
 import LinkCard from "../components/LinkCard/LinkCard";
 import LinkMiniCard from "../components/LinkMiniCard/LinkMiniCard";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
