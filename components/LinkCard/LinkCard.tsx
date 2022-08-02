@@ -1,6 +1,11 @@
 import ILink from "../../interfaces/link";
 import styles from "./LinkCard.module.scss";
-import { AiFillEdit, AiFillDelete, AiFillSave } from "react-icons/ai";
+import {
+  AiFillEdit,
+  AiFillDelete,
+  AiFillSave,
+  AiOutlineClose,
+} from "react-icons/ai";
 import { useAppDispatch } from "../../hooks/redux";
 import { chooseCard } from "../../features/profileLinkCard/cardSlice";
 import { useRouter } from "next/router";
@@ -88,9 +93,14 @@ export default function LinkCard({ link }: LinkCardProps) {
       }
 
       setEditBtn(
-        <button type="submit" onClick={handleSubmit(onSubmit)}>
-          Сохранить <AiFillSave />
-        </button>
+        <div className={styles.wrapper__editControls}>
+          <button type="submit" onClick={handleSubmit(onSubmit)}>
+            Сохранить <AiFillSave />
+          </button>
+          <button type="button" onClick={() => editHandler(false)}>
+            Отмена <AiOutlineClose />
+          </button>
+        </div>
       );
     } else {
       if (editText.current !== null) {
