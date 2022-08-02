@@ -6,10 +6,10 @@ import {
   AiFillSave,
   AiOutlineClose,
 } from "react-icons/ai";
-import { useAppDispatch } from "../../hooks/redux";
-import { chooseCard } from "../../features/profileLinkCard/cardSlice";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { chooseCard, editCard } from "../../features/profileLinkCard/cardSlice";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type LinkCardProps = {
@@ -22,16 +22,25 @@ type FormInput = {
 
 export default function LinkCard({ link }: LinkCardProps) {
   const dispatch = useAppDispatch();
+  const idCard = useAppSelector((state) => state.card.idCard);
+  const editCardState = useAppSelector((state) => state.card.editState);
+
   const router = useRouter();
   const {
     register,
     handleSubmit,
-    setFocus,
+    reset,
     formState: { errors },
   } = useForm<FormInput>();
 
   const editText = useRef<HTMLParagraphElement>(null);
   const editForm = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    reset({
+      shortLink: link.shortLink,
+    });
+  }, [link, reset]);
 
   const refreshData = () => {
     router.replace(router.asPath);
@@ -56,6 +65,9 @@ export default function LinkCard({ link }: LinkCardProps) {
     });
 
     const result = await res.json();
+
+    dispatch(chooseCard(result._id));
+    refreshData();
   };
 
   const validateLink = async (shortLink: string) => {
@@ -75,66 +87,27 @@ export default function LinkCard({ link }: LinkCardProps) {
   };
 
   const onSubmit: SubmitHandler<FormInput> = (data) => {
-    editHandler(false);
+    dispatch(editCard(false));
 
     editLink(link.shortLink, data.shortLink);
-    dispatch(chooseCard("null"));
-    refreshData();
   };
-
-  const editHandler = (currState: boolean) => {
-    if (currState) {
-      if (editText.current !== null) {
-        editText.current.style.display = "none";
-      }
-
-      if (editForm.current !== null) {
-        editForm.current.style.display = "inline";
-      }
-
-      setEditBtn(
-        <div className={styles.wrapper__editControls}>
-          <button type="submit" onClick={handleSubmit(onSubmit)}>
-            Сохранить <AiFillSave />
-          </button>
-          <button type="button" onClick={() => editHandler(false)}>
-            Отмена <AiOutlineClose />
-          </button>
-        </div>
-      );
-    } else {
-      if (editText.current !== null) {
-        editText.current.style.display = "inline";
-      }
-
-      if (editForm.current !== null) {
-        editForm.current.style.display = "none";
-      }
-
-      setEditBtn(
-        <button type="button" onClick={() => editHandler(true)}>
-          Изменить короткую ссылку <AiFillEdit />
-        </button>
-      );
-    }
-  };
-
-  const [editBtn, setEditBtn] = useState(
-    <button type="button" onClick={() => editHandler(true)}>
-      Изменить короткую ссылку <AiFillEdit />
-    </button>
-  );
 
   return (
     <div className={styles.wrapper}>
       <p className={styles.wrapper__fullLink}>{link.fullLink}</p>
-      <p id="editLinkText" ref={editText} className={styles.wrapper__shortLink}>
+      <p
+        id="editLinkText"
+        ref={editText}
+        className={styles.wrapper__shortLink}
+        style={{ display: editCardState ? "none" : "inline" }}
+      >
         goshort.ga/{link.shortLink}
       </p>
       <span
         id="editLinkForm"
         className={styles.wrapper__editLinkForm}
         ref={editForm}
+        style={{ display: editCardState ? "inline" : "none" }}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           <p className={styles.wrapper__shortLink}>goshort.ga/</p>
@@ -167,10 +140,23 @@ export default function LinkCard({ link }: LinkCardProps) {
         </form>
       </span>
       <p className={styles.wrapper__createdAt}>
-        {new Date(link.createdAt).toLocaleDateString("en-GB")}
+        {new Date(link.createdAt).toLocaleDateString()}
       </p>
       <div className={styles.wrapper__controls}>
-        {editBtn}
+        {editCardState ? (
+          <div className={styles.wrapper__editControls}>
+            <button type="submit" onClick={handleSubmit(onSubmit)}>
+              Сохранить <AiFillSave />
+            </button>
+            <button type="button" onClick={() => dispatch(editCard(false))}>
+              Отмена <AiOutlineClose />
+            </button>
+          </div>
+        ) : (
+          <button type="button" onClick={() => dispatch(editCard(true))}>
+            Изменить короткую ссылку <AiFillEdit />
+          </button>
+        )}
         <button
           type="button"
           id={styles.deleteBtn}
