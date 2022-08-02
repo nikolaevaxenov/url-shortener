@@ -28,7 +28,6 @@ const Profile: NextPage<ProfileProps> = ({ links }: ProfileProps) => {
               _id: "lorem",
               shortLink: "lorem",
               fullLink: "lorem",
-              expiryDate: "lorem",
               createdAt: "lorem",
             }
           }
