@@ -10,5 +10,5 @@ export interface Link {
   username: string;
   shortLink: string;
   fullLink: string;
-  expiryDate: string;
+  createdAt: string;
 }

@@ -18,9 +18,6 @@ export const connect = async () => {
       unique: true,
     },
     fullLink: String,
-    expiryDate: {
-      type: Date,
-    },
     createdAt: {
       type: Date,
     },

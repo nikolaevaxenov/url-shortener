@@ -25,7 +25,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await Link.create({
           ...req.body,
           shortLink: shortLink.id,
-          expiryDate: currDate.setMonth(currDate.getMonth() + 6),
           createdAt: currDate,
         }).catch(catcher)
       );
