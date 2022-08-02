@@ -68,6 +68,18 @@
     cursor: pointer;
   }
 
+  &__reloadButton {
+    background: $title-color;
+    border: 0;
+    border-radius: 7px;
+    color: lighten($navbar-bg, 10%);
+    margin-top: 0.5rem;
+    padding: 15px;
+    width: 20rem;
+
+    cursor: pointer;
+  }
+
   &__adText {
     margin-top: 4rem;
     padding: 0 1rem;
