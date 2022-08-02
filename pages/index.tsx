@@ -120,6 +120,7 @@ const Home: NextPage = () => {
         <button
           type="button"
           className={styles.main__reloadButton}
+          style={{ display: creationSuccess[0] === "ready" ? "block" : "none" }}
           onClick={() => {
             setCreationSuccess(["idle", ""]);
             reset();
