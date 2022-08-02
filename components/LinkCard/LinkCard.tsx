@@ -1,10 +1,15 @@
 import ILink from "../../interfaces/link";
 import styles from "./LinkCard.module.scss";
-import { AiFillEdit, AiFillDelete, AiFillSave } from "react-icons/ai";
-import { useAppDispatch } from "../../hooks/redux";
-import { chooseCard } from "../../features/profileLinkCard/cardSlice";
+import {
+  AiFillEdit,
+  AiFillDelete,
+  AiFillSave,
+  AiOutlineClose,
+} from "react-icons/ai";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { chooseCard, editCard } from "../../features/profileLinkCard/cardSlice";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type LinkCardProps = {
@@ -17,16 +22,25 @@ type FormInput = {
 
 export default function LinkCard({ link }: LinkCardProps) {
   const dispatch = useAppDispatch();
+  const idCard = useAppSelector((state) => state.card.idCard);
+  const editCardState = useAppSelector((state) => state.card.editState);
+
   const router = useRouter();
   const {
     register,
     handleSubmit,
-    setFocus,
+    reset,
     formState: { errors },
   } = useForm<FormInput>();
 
   const editText = useRef<HTMLParagraphElement>(null);
   const editForm = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    reset({
+      shortLink: link.shortLink,
+    });
+  }, [link, reset]);
 
   const refreshData = () => {
     router.replace(router.asPath);
@@ -51,65 +65,49 @@ export default function LinkCard({ link }: LinkCardProps) {
     });
 
     const result = await res.json();
-    console.log("Result = ", result);
-  };
 
-  const onSubmit: SubmitHandler<FormInput> = (data) => {
-    editHandler(false);
-
-    editLink(link.shortLink, data.shortLink);
-    dispatch(chooseCard("null"));
+    dispatch(chooseCard(result._id));
     refreshData();
   };
 
-  const editHandler = (currState: boolean) => {
-    if (currState) {
-      if (editText.current !== null) {
-        editText.current.style.display = "none";
-      }
+  const validateLink = async (shortLink: string) => {
+    const usedWords = ["profile"];
 
-      if (editForm.current !== null) {
-        editForm.current.style.display = "inline";
-      }
+    const res = await fetch(`/api/links/${shortLink}`, {
+      method: "get",
+    });
 
-      setEditBtn(
-        <button type="submit" onClick={handleSubmit(onSubmit)}>
-          Сохранить <AiFillSave />
-        </button>
-      );
+    const result = await res.json();
+
+    if (usedWords.includes(shortLink) || result !== null) {
+      return "Указанная короткая ссылка уже существует";
     } else {
-      if (editText.current !== null) {
-        editText.current.style.display = "inline";
-      }
-
-      if (editForm.current !== null) {
-        editForm.current.style.display = "none";
-      }
-
-      setEditBtn(
-        <button type="button" onClick={() => editHandler(true)}>
-          Изменить короткую ссылку <AiFillEdit />
-        </button>
-      );
+      return true;
     }
   };
 
-  const [editBtn, setEditBtn] = useState(
-    <button type="button" onClick={() => editHandler(true)}>
-      Изменить короткую ссылку <AiFillEdit />
-    </button>
-  );
+  const onSubmit: SubmitHandler<FormInput> = (data) => {
+    dispatch(editCard(false));
+
+    editLink(link.shortLink, data.shortLink);
+  };
 
   return (
     <div className={styles.wrapper}>
       <p className={styles.wrapper__fullLink}>{link.fullLink}</p>
-      <p id="editLinkText" ref={editText} className={styles.wrapper__shortLink}>
+      <p
+        id="editLinkText"
+        ref={editText}
+        className={styles.wrapper__shortLink}
+        style={{ display: editCardState ? "none" : "inline" }}
+      >
         goshort.ga/{link.shortLink}
       </p>
       <span
         id="editLinkForm"
         className={styles.wrapper__editLinkForm}
         ref={editForm}
+        style={{ display: editCardState ? "inline" : "none" }}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           <p className={styles.wrapper__shortLink}>goshort.ga/</p>
@@ -132,6 +130,7 @@ export default function LinkCard({ link }: LinkCardProps) {
                 message:
                   "Ссылка должна содержать только цифры и латинские буквы",
               },
+              validate: (newShortLink) => validateLink(newShortLink),
             })}
           />
 
@@ -141,10 +140,23 @@ export default function LinkCard({ link }: LinkCardProps) {
         </form>
       </span>
       <p className={styles.wrapper__createdAt}>
-        {new Date(link.createdAt).toLocaleDateString("en-GB")}
+        {new Date(link.createdAt).toLocaleDateString()}
       </p>
       <div className={styles.wrapper__controls}>
-        {editBtn}
+        {editCardState ? (
+          <div className={styles.wrapper__editControls}>
+            <button type="submit" onClick={handleSubmit(onSubmit)}>
+              Сохранить <AiFillSave />
+            </button>
+            <button type="button" onClick={() => dispatch(editCard(false))}>
+              Отмена <AiOutlineClose />
+            </button>
+          </div>
+        ) : (
+          <button type="button" onClick={() => dispatch(editCard(true))}>
+            Изменить короткую ссылку <AiFillEdit />
+          </button>
+        )}
         <button
           type="button"
           id={styles.deleteBtn}

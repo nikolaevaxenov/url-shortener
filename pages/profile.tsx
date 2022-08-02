@@ -6,7 +6,8 @@ import ILink from "../interfaces/link";
 import LinkCard from "../components/LinkCard/LinkCard";
 import LinkMiniCard from "../components/LinkMiniCard/LinkMiniCard";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
-import { chooseCard } from "../features/profileLinkCard/cardSlice";
+import { chooseCard, editCard } from "../features/profileLinkCard/cardSlice";
+import { useEffect, useState } from "react";
 
 type ProfileProps = {
   links: ILink[];
@@ -15,6 +16,28 @@ type ProfileProps = {
 const Profile: NextPage<ProfileProps> = ({ links }: ProfileProps) => {
   const idCard = useAppSelector((state) => state.card.idCard);
   const dispatch = useAppDispatch();
+
+  const [linkCard, setLinkCard] = useState(<></>);
+
+  useEffect(() => {
+    if (idCard !== "null") {
+      setLinkCard(
+        <LinkCard
+          link={
+            links.find((link) => link._id === idCard) ?? {
+              _id: "lorem",
+              shortLink: "lorem",
+              fullLink: "lorem",
+              expiryDate: "lorem",
+              createdAt: "lorem",
+            }
+          }
+        />
+      );
+    } else {
+      setLinkCard(<></>);
+    }
+  }, [idCard, links]);
 
   return (
     <>
@@ -28,26 +51,17 @@ const Profile: NextPage<ProfileProps> = ({ links }: ProfileProps) => {
             <div
               className={styles.wrapper__linkCard}
               key={link._id}
-              onClick={() => dispatch(chooseCard(link._id))}
+              onClick={() => {
+                dispatch(chooseCard(link._id));
+                dispatch(editCard(false));
+              }}
             >
               <LinkMiniCard link={link} />
             </div>
           ))}
         </div>
         <div className={styles.wrapper__rightSide}>
-          {idCard !== "null" && (
-            <LinkCard
-              link={
-                links.find((link) => link._id === idCard) ?? {
-                  _id: "lorem",
-                  shortLink: "lorem",
-                  fullLink: "lorem",
-                  expiryDate: "lorem",
-                  createdAt: "lorem",
-                }
-              }
-            />
-          )}
+          {idCard !== "null" && linkCard}
         </div>
       </main>
     </>
