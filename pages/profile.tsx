@@ -8,6 +8,9 @@ import LinkMiniCard from "../components/LinkMiniCard/LinkMiniCard";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { chooseCard, editCard } from "../features/profileLinkCard/cardSlice";
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/router";
 
 type ProfileProps = {
   links: ILink[];
@@ -16,11 +19,27 @@ type ProfileProps = {
 const Profile: NextPage<ProfileProps> = ({ links }: ProfileProps) => {
   const idCard = useAppSelector((state) => state.card.idCard);
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const [linkCard, setLinkCard] = useState(<></>);
 
   useEffect(() => {
-    if (idCard !== "null") {
+    if (idCard === "deleted") {
+      toast.error("Ссылка удалена!", {
+        position: "bottom-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+      });
+
+      dispatch(chooseCard("null"));
+      router.replace(router.asPath);
+    } else if (idCard === "null") {
+      setLinkCard(<></>);
+    } else {
       setLinkCard(
         <LinkCard
           link={
@@ -34,10 +53,8 @@ const Profile: NextPage<ProfileProps> = ({ links }: ProfileProps) => {
           }
         />
       );
-    } else {
-      setLinkCard(<></>);
     }
-  }, [idCard, links]);
+  }, [dispatch, idCard, links, router]);
 
   return (
     <>
@@ -60,9 +77,18 @@ const Profile: NextPage<ProfileProps> = ({ links }: ProfileProps) => {
             </div>
           ))}
         </div>
-        <div className={styles.wrapper__rightSide}>
-          {idCard !== "null" && linkCard}
-        </div>
+        <div className={styles.wrapper__rightSide}>{linkCard}</div>
+        <ToastContainer
+          position="bottom-center"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss={false}
+          draggable
+          pauseOnHover={false}
+        />
       </main>
     </>
   );

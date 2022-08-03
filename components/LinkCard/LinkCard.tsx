@@ -12,6 +12,8 @@ import { chooseCard, editCard } from "../../features/profileLinkCard/cardSlice";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type LinkCardProps = {
   link: ILink;
@@ -52,8 +54,7 @@ export default function LinkCard({ link }: LinkCardProps) {
       method: "delete",
     });
 
-    dispatch(chooseCard("null"));
-    refreshData();
+    dispatch(chooseCard("deleted"));
   };
 
   const editLink = async (shortLink: string, newShortLink: string) => {
@@ -66,6 +67,16 @@ export default function LinkCard({ link }: LinkCardProps) {
     });
 
     const result = await res.json();
+
+    toast.success("Ссылка успешно изменена!", {
+      position: "bottom-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+    });
 
     dispatch(chooseCard(result._id));
     refreshData();
@@ -182,6 +193,17 @@ export default function LinkCard({ link }: LinkCardProps) {
           Удалить <AiFillDelete />
         </button>
       </div>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover={false}
+      />
     </div>
   );
 }
