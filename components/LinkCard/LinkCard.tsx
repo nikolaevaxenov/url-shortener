@@ -149,21 +149,34 @@ export default function LinkCard({ link }: LinkCardProps) {
       <div className={styles.wrapper__controls}>
         {editCardState ? (
           <div className={styles.wrapper__editControls}>
-            <button type="submit" onClick={handleSubmit(onSubmit)}>
+            <button
+              type="submit"
+              className={styles.iconWithText}
+              onClick={handleSubmit(onSubmit)}
+            >
               Сохранить <AiFillSave />
             </button>
-            <button type="button" onClick={() => dispatch(editCard(false))}>
+            <button
+              type="button"
+              className={styles.iconWithText}
+              onClick={() => dispatch(editCard(false))}
+            >
               Отмена <AiOutlineClose />
             </button>
           </div>
         ) : (
-          <button type="button" onClick={() => dispatch(editCard(true))}>
+          <button
+            className={styles.iconWithText}
+            type="button"
+            onClick={() => dispatch(editCard(true))}
+          >
             Изменить короткую ссылку <AiFillEdit />
           </button>
         )}
         <button
           type="button"
           id={styles.deleteBtn}
+          className={styles.iconWithText}
           onClick={() => deleteLink(link.shortLink)}
         >
           Удалить <AiFillDelete />
