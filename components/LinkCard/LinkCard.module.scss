@@ -24,6 +24,14 @@
 
   &__shortLink {
     font-size: 1rem;
+
+    a {
+      text-decoration: underline;
+
+      &:hover {
+        color: lighten(black, 30%);
+      }
+    }
   }
 
   &__dateViews {
