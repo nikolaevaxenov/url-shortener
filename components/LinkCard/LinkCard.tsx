@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Link from "next/link";
 
 type LinkCardProps = {
   link: ILink;
@@ -35,9 +36,6 @@ export default function LinkCard({ link }: LinkCardProps) {
     reset,
     formState: { errors },
   } = useForm<FormInput>();
-
-  const editText = useRef<HTMLParagraphElement>(null);
-  const editForm = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     reset({
@@ -107,18 +105,16 @@ export default function LinkCard({ link }: LinkCardProps) {
   return (
     <div className={styles.wrapper}>
       <p className={styles.wrapper__fullLink}>{link.fullLink}</p>
-      <p
-        id="editLinkText"
-        ref={editText}
+      <div
         className={styles.wrapper__shortLink}
         style={{ display: editCardState ? "none" : "inline" }}
       >
-        goshort.ga/{link.shortLink}
-      </p>
+        <Link href={`/${link.shortLink}`}>
+          <a target="_blank">goshort.ga/{link.shortLink}</a>
+        </Link>
+      </div>
       <span
-        id="editLinkForm"
         className={styles.wrapper__editLinkForm}
-        ref={editForm}
         style={{ display: editCardState ? "inline" : "none" }}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
