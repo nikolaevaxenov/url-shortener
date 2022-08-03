@@ -110,7 +110,7 @@ export default function LinkCard({ link }: LinkCardProps) {
         style={{ display: editCardState ? "none" : "inline" }}
       >
         <Link href={`/${link.shortLink}`}>
-          <a>goshort.ga/{link.shortLink}</a>
+          <a target="_blank">goshort.ga/{link.shortLink}</a>
         </Link>
       </div>
       <span
