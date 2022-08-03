@@ -12,7 +12,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
 
   const result = await res.json();
-  console.log("Result = ", result);
+
+  if (result !== null) {
+    const vres = await fetch(`${process.env.APP_URL}/api/links/${shortLink}`, {
+      method: "put",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ views: result.views + 1 }),
+    });
+
+    const vresult = await vres.json();
+  }
 
   return {
     redirect: {

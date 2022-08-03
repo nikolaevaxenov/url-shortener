@@ -22,9 +22,17 @@
     font-size: 0.8rem;
   }
 
-  &__createdAt {
+  &__dateViews {
+    display: flex;
+    align-items: center;
     color: lighten(black, 30%);
     font-size: 0.8rem;
+
+    p {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
   }
 
   &:hover {

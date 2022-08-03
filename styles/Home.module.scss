@@ -57,6 +57,10 @@
   }
 
   &__urlButton {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+
     background: $title-color;
     border: 0;
     border-radius: 7px;
@@ -70,6 +74,10 @@
   }
 
   &__reloadButton {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+
     background: $title-color;
     border: 0;
     border-radius: 7px;

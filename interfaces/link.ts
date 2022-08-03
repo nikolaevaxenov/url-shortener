@@ -3,4 +3,5 @@ export default interface ILink {
   shortLink: string;
   fullLink: string;
   createdAt: string;
+  views: number;
 }

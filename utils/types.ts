@@ -11,4 +11,5 @@ export interface Link {
   shortLink: string;
   fullLink: string;
   createdAt: string;
+  views: number;
 }

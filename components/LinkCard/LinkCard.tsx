@@ -5,12 +5,15 @@ import {
   AiFillDelete,
   AiFillSave,
   AiOutlineClose,
+  AiFillEye,
 } from "react-icons/ai";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { chooseCard, editCard } from "../../features/profileLinkCard/cardSlice";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type LinkCardProps = {
   link: ILink;
@@ -51,8 +54,7 @@ export default function LinkCard({ link }: LinkCardProps) {
       method: "delete",
     });
 
-    dispatch(chooseCard("null"));
-    refreshData();
+    dispatch(chooseCard("deleted"));
   };
 
   const editLink = async (shortLink: string, newShortLink: string) => {
@@ -65,6 +67,16 @@ export default function LinkCard({ link }: LinkCardProps) {
     });
 
     const result = await res.json();
+
+    toast.success("Ссылка успешно изменена!", {
+      position: "bottom-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+    });
 
     dispatch(chooseCard(result._id));
     refreshData();
@@ -139,32 +151,59 @@ export default function LinkCard({ link }: LinkCardProps) {
           )}
         </form>
       </span>
-      <p className={styles.wrapper__createdAt}>
-        {new Date(link.createdAt).toLocaleDateString()}
-      </p>
+      <div className={styles.wrapper__dateViews}>
+        <div>{new Date(link.createdAt).toLocaleDateString()}</div>
+        <div>
+          {link.views} <AiFillEye />
+        </div>
+      </div>
       <div className={styles.wrapper__controls}>
         {editCardState ? (
           <div className={styles.wrapper__editControls}>
-            <button type="submit" onClick={handleSubmit(onSubmit)}>
+            <button
+              type="submit"
+              className={styles.iconWithText}
+              onClick={handleSubmit(onSubmit)}
+            >
               Сохранить <AiFillSave />
             </button>
-            <button type="button" onClick={() => dispatch(editCard(false))}>
+            <button
+              type="button"
+              className={styles.iconWithText}
+              onClick={() => dispatch(editCard(false))}
+            >
               Отмена <AiOutlineClose />
             </button>
           </div>
         ) : (
-          <button type="button" onClick={() => dispatch(editCard(true))}>
+          <button
+            className={styles.iconWithText}
+            type="button"
+            onClick={() => dispatch(editCard(true))}
+          >
             Изменить короткую ссылку <AiFillEdit />
           </button>
         )}
         <button
           type="button"
           id={styles.deleteBtn}
+          className={styles.iconWithText}
           onClick={() => deleteLink(link.shortLink)}
         >
           Удалить <AiFillDelete />
         </button>
       </div>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover={false}
+      />
     </div>
   );
 }
