@@ -20,9 +20,20 @@
     font-size: 1rem;
   }
 
-  &__createdAt {
+  &__dateViews {
+    display: flex;
+
+    margin: 1rem 0;
+
     color: lighten(black, 30%);
     font-size: 0.8rem;
+
+    div:last-of-type {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-left: 2rem;
+    }
   }
 
   &__editControls {

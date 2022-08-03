@@ -21,6 +21,10 @@ export const connect = async () => {
     createdAt: {
       type: Date,
     },
+    views: {
+      type: Number,
+      default: 0,
+    },
   });
 
   const Link = mongoose.models.Link || mongoose.model("Link", LinkSchema);

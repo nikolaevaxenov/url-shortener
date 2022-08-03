@@ -5,6 +5,7 @@ import {
   AiFillDelete,
   AiFillSave,
   AiOutlineClose,
+  AiFillEye,
 } from "react-icons/ai";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { chooseCard, editCard } from "../../features/profileLinkCard/cardSlice";
@@ -139,9 +140,12 @@ export default function LinkCard({ link }: LinkCardProps) {
           )}
         </form>
       </span>
-      <p className={styles.wrapper__createdAt}>
-        {new Date(link.createdAt).toLocaleDateString()}
-      </p>
+      <div className={styles.wrapper__dateViews}>
+        <div>{new Date(link.createdAt).toLocaleDateString()}</div>
+        <div>
+          {link.views} <AiFillEye />
+        </div>
+      </div>
       <div className={styles.wrapper__controls}>
         {editCardState ? (
           <div className={styles.wrapper__editControls}>
