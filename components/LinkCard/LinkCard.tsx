@@ -6,6 +6,7 @@ import {
   AiFillSave,
   AiOutlineClose,
   AiFillEye,
+  AiOutlineCopy,
 } from "react-icons/ai";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { chooseCard, editCard } from "../../features/profileLinkCard/cardSlice";
@@ -15,6 +16,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 type LinkCardProps = {
   link: ILink;
@@ -109,9 +111,16 @@ export default function LinkCard({ link }: LinkCardProps) {
         className={styles.wrapper__shortLink}
         style={{ display: editCardState ? "none" : "inline" }}
       >
-        <Link href={`/${link.shortLink}`}>
-          <a target="_blank">goshort.ga/{link.shortLink}</a>
-        </Link>
+        <div className={styles.wrapper__shortLinkBlock}>
+          <Link href={`/${link.shortLink}`}>
+            <a target="_blank">goshort.ga/{link.shortLink}</a>
+          </Link>
+          <CopyToClipboard text={`https://goshort.ga/${link.shortLink}`}>
+            <button type="button">
+              <AiOutlineCopy />
+            </button>
+          </CopyToClipboard>
+        </div>
       </div>
       <span
         className={styles.wrapper__editLinkForm}
