@@ -27,7 +27,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     redirect: {
-      destination: result.fullLink ?? "/",
+      destination: result?.fullLink ?? "/",
       permanent: false,
     },
   };
