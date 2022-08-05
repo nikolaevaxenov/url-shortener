@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { getDate, getNewId } from "../../../services/other";
 import { connect } from "../../../utils/connection";
 import { ResponseFuncs } from "../../../utils/types";
 
@@ -14,11 +15,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     },
     POST: async (req: NextApiRequest, res: NextApiResponse) => {
       const { Link } = await connect();
-      const idReq = await fetch(`${process.env.APP_URL}/api/randomid`);
-      const dateReq = await fetch(`${process.env.APP_URL}/api/date`);
-
-      const shortLink = await idReq.json();
-      const dateResult = await dateReq.json();
+      const shortLink = await getNewId();
+      const dateResult = await getDate();
       const currDate = new Date(dateResult.date);
 
       res.json(

@@ -1,46 +1,33 @@
 import type { NextPage } from "next";
-import { UserContext, useUser } from "@auth0/nextjs-auth0";
+import { useUser } from "@auth0/nextjs-auth0";
 import { useForm } from "react-hook-form";
 import { AiOutlineCopy, AiOutlineReload } from "react-icons/ai";
 import Head from "next/head";
 import styles from "../styles/Home.module.scss";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useMutation } from "@tanstack/react-query";
+import { createLink, LinkData } from "../services/link";
 
 type FormData = {
   fullLink: string;
 };
 
 const Home: NextPage = () => {
-  const { user, error, isLoading } = useUser();
+  const { user } = useUser();
   const { register, handleSubmit, reset } = useForm<FormData>();
+  const createLinkMutation = useMutation((linkData: LinkData) =>
+    createLink(linkData)
+  );
 
-  const [creationSuccess, setCreationSuccess] = useState(["idle", ""]);
   const resultLink = useRef<HTMLInputElement>(null);
 
-  const createLink = async ({ fullLink }: FormData) => {
-    const linkObj = user
-      ? { username: user.email, fullLink: fullLink }
-      : { fullLink: fullLink };
-
-    setCreationSuccess(["loading", ""]);
-    const res = await fetch("/api/links", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(linkObj),
-    });
-
-    const result = await res.json();
-    console.log("Result = ", result);
-
-    if (resultLink.current) {
-      resultLink.current.value = `goshort.ga/${result.shortLink}`;
-      setCreationSuccess(["ready", `https://goshort.ga/${result.shortLink}`]);
-    }
+  const submitHandler = ({ fullLink }: FormData) => {
+    createLinkMutation.mutate(
+      user ? { fullLink, username: user?.email } : { fullLink }
+    );
   };
 
   const handleCopy = () => {
@@ -67,67 +54,62 @@ const Home: NextPage = () => {
       <main className={styles.main}>
         <p className={styles.main__title}>GoShort</p>
         <p className={styles.main__subText}>сервис сокращения ссылок</p>
-        <div
-          id="inputForm"
-          className={styles.main__inputGroup}
-          style={{ display: creationSuccess[0] === "idle" ? "block" : "none" }}
-        >
-          <form onSubmit={handleSubmit(createLink)}>
+        {createLinkMutation.isIdle && (
+          <div id="inputForm" className={styles.main__inputGroup}>
+            <form onSubmit={handleSubmit(submitHandler)}>
+              <input
+                type="url"
+                placeholder="Вставьте сюда вашу ссылку"
+                className={styles.main__urlInput}
+                {...register("fullLink")}
+              />
+              <button type="submit" className={styles.main__urlButton}>
+                Сократить
+              </button>
+            </form>
+          </div>
+        )}
+        {createLinkMutation.isLoading && (
+          <div className={styles.main__inputGroup}>
             <input
-              type="url"
-              placeholder="Вставьте сюда вашу ссылку"
+              readOnly
+              value="Загрузка..."
               className={styles.main__urlInput}
-              {...register("fullLink")}
             />
-            <button type="submit" className={styles.main__urlButton}>
-              Сократить
-            </button>
-          </form>
-        </div>
-        <div
-          className={styles.main__inputGroup}
-          style={{
-            display: creationSuccess[0] === "loading" ? "block" : "none",
-          }}
-        >
-          <input
-            readOnly
-            value="Загрузка..."
-            className={styles.main__urlInput}
-          />
-        </div>
-        <div
-          id="resultForm"
-          className={styles.main__inputGroup}
-          style={{ display: creationSuccess[0] === "ready" ? "block" : "none" }}
-        >
-          <input
-            ref={resultLink}
-            readOnly
-            className={styles.main__urlInput}
-            onClick={(e) => e.currentTarget.select()}
-          />
+          </div>
+        )}
+        {createLinkMutation.isSuccess && (
+          <>
+            <div id="resultForm" className={styles.main__inputGroup}>
+              <input
+                ref={resultLink}
+                readOnly
+                className={styles.main__urlInput}
+                value={`https://goshort.ga/${createLinkMutation.data.shortLink}`}
+                onClick={(e) => e.currentTarget.select()}
+              />
 
-          <CopyToClipboard
-            text={creationSuccess[1]}
-            onCopy={() => handleCopy()}
-          >
-            <button type="button" className={styles.main__urlButton}>
-              Скопировать <AiOutlineCopy />
+              <CopyToClipboard
+                text={`https://goshort.ga/${createLinkMutation.data.shortLink}`}
+                onCopy={() => handleCopy()}
+              >
+                <button type="button" className={styles.main__urlButton}>
+                  Скопировать <AiOutlineCopy />
+                </button>
+              </CopyToClipboard>
+            </div>
+            <button
+              type="button"
+              className={styles.main__reloadButton}
+              onClick={() => {
+                createLinkMutation.reset();
+                reset();
+              }}
+            >
+              Сократить новую ссылку <AiOutlineReload />
             </button>
-          </CopyToClipboard>
-        </div>
-        <button
-          type="button"
-          className={styles.main__reloadButton}
-          style={{ display: creationSuccess[0] === "ready" ? "block" : "none" }}
-          onClick={() => {
-            setCreationSuccess(["idle", ""]);
-            reset();
-          }}
-        >
-          Сократить новую ссылку <AiOutlineReload />
-        </button>
+          </>
+        )}
 
         <p className={styles.main__adText}>
           Вы можете изменять, удалять, задавать собственные адреса ссылкам

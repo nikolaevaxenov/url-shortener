@@ -1,3 +1,5 @@
+@import "../../styles/colors.module.scss";
+
 .iconWithText {
   display: flex;
   align-items: center;
@@ -34,6 +36,32 @@
     }
   }
 
+  &__shortLinkBlock {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    & button {
+      display: flex;
+      align-items: center;
+
+      background: $title-color;
+      border: 0;
+      border-radius: 7px;
+      color: lighten($navbar-bg, 10%);
+      padding: 10px;
+
+      cursor: pointer;
+      transition: 0.5s;
+
+      &:hover {
+        -webkit-box-shadow: 1px 1px 20px 0px rgba(34, 60, 80, 0.2);
+        -moz-box-shadow: 1px 1px 20px 0px rgba(34, 60, 80, 0.2);
+        box-shadow: 1px 1px 20px 0px rgba(34, 60, 80, 0.2);
+      }
+    }
+  }
+
   &__dateViews {
     display: flex;
 
@@ -57,7 +85,7 @@
   }
 
   &__editLinkForm {
-    display: none;
+    display: inline;
 
     & form p {
       display: inline;
