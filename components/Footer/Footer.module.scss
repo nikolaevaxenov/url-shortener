@@ -12,4 +12,12 @@
     padding: 0;
     margin: 0;
   }
+
+  a {
+    transition: color 0.3s;
+
+    &:hover {
+      color: lighten(black, 70%);
+    }
+  }
 }
