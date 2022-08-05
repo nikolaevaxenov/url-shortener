@@ -61,6 +61,7 @@ const Home: NextPage = () => {
                 type="url"
                 placeholder="Вставьте сюда вашу ссылку"
                 className={styles.main__urlInput}
+                required
                 {...register("fullLink")}
               />
               <button type="submit" className={styles.main__urlButton}>
