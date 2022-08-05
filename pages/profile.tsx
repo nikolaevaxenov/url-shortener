@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
+import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import styles from "../styles/Profile.module.scss";
 import ILink from "../interfaces/link";
 import LinkCard from "../components/LinkCard/LinkCard";
@@ -11,17 +11,29 @@ import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/router";
+import { useQuery } from "@tanstack/react-query";
+import { getUserLinks } from "../services/link";
+import { UserData } from "auth0";
 
 type ProfileProps = {
-  links: ILink[];
+  user: UserData;
 };
 
-const Profile: NextPage<ProfileProps> = ({ links }: ProfileProps) => {
+const Profile: NextPage<ProfileProps> = ({ user }) => {
   const idCard = useAppSelector((state) => state.card.idCard);
+  const editState = useAppSelector((state) => state.card.editState);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const { refetch, data, isLoading } = useQuery(
+    ["links", user.email as string],
+    () => getUserLinks(user.email as string)
+  );
 
   const [linkCard, setLinkCard] = useState(<></>);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch, editState]);
 
   useEffect(() => {
     if (idCard === "deleted") {
@@ -36,14 +48,14 @@ const Profile: NextPage<ProfileProps> = ({ links }: ProfileProps) => {
       });
 
       dispatch(chooseCard("null"));
-      router.replace(router.asPath);
+      refetch();
     } else if (idCard === "null") {
       setLinkCard(<></>);
     } else {
       setLinkCard(
         <LinkCard
           link={
-            links.find((link) => link._id === idCard) ?? {
+            data.find((link: ILink) => link._id === idCard) ?? {
               _id: "lorem",
               shortLink: "lorem",
               fullLink: "lorem",
@@ -54,7 +66,7 @@ const Profile: NextPage<ProfileProps> = ({ links }: ProfileProps) => {
         />
       );
     }
-  }, [dispatch, idCard, links, router]);
+  }, [data, dispatch, idCard, refetch, router]);
 
   return (
     <>
@@ -62,21 +74,25 @@ const Profile: NextPage<ProfileProps> = ({ links }: ProfileProps) => {
         <title>Личный кабинет</title>
       </Head>
       <main className={styles.wrapper}>
-        <div className={styles.wrapper__leftSide}>
-          <p className={styles.wrapper__linkCount}>{links.length} ссылок</p>
-          {links.map((link) => (
-            <div
-              className={styles.wrapper__linkCard}
-              key={link._id}
-              onClick={() => {
-                dispatch(chooseCard(link._id));
-                dispatch(editCard(false));
-              }}
-            >
-              <LinkMiniCard link={link} />
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div>Загрузка...</div>
+        ) : (
+          <div className={styles.wrapper__leftSide}>
+            <p className={styles.wrapper__linkCount}>{data.length} ссылок</p>
+            {data.map((link: ILink) => (
+              <div
+                className={styles.wrapper__linkCard}
+                key={link._id}
+                onClick={() => {
+                  dispatch(chooseCard(link._id));
+                  dispatch(editCard(false));
+                }}
+              >
+                <LinkMiniCard link={link} />
+              </div>
+            ))}
+          </div>
+        )}
         <div className={styles.wrapper__rightSide}>{linkCard}</div>
         <ToastContainer
           position="bottom-center"
@@ -94,27 +110,6 @@ const Profile: NextPage<ProfileProps> = ({ links }: ProfileProps) => {
   );
 };
 
-export const getServerSideProps = withPageAuthRequired({
-  returnTo: "/",
-  async getServerSideProps(context) {
-    const session = getSession(context.req, context.res);
-
-    const res = await fetch(
-      `${process.env.APP_URL}/api/links/user/${session?.user.email}`,
-      {
-        method: "get",
-      }
-    );
-
-    const result = await res.json();
-    console.log("Result = ", result);
-
-    return {
-      props: {
-        links: result,
-      },
-    };
-  },
-});
+export const getServerSideProps = withPageAuthRequired();
 
 export default Profile;

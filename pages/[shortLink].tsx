@@ -1,4 +1,5 @@
 import type { GetServerSideProps, NextPage } from "next";
+import { getLink, incrementViewsOnLink } from "../services/link";
 
 const ShortLinkRedirect: NextPage = () => {
   return <></>;
@@ -7,22 +8,14 @@ const ShortLinkRedirect: NextPage = () => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const shortLink = context?.params?.shortLink;
 
-  const res = await fetch(`${process.env.APP_URL}/api/links/${shortLink}`, {
-    method: "get",
-  });
+  const res = await getLink(shortLink as string, true);
 
-  const result = await res.json();
+  const result = await res;
 
   if (result !== null) {
-    const vres = await fetch(`${process.env.APP_URL}/api/links/${shortLink}`, {
-      method: "put",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ views: result.views + 1 }),
-    });
+    const vres = await incrementViewsOnLink(shortLink as string, true);
 
-    const vresult = await vres.json();
+    const vresult = await vres;
   }
 
   return {

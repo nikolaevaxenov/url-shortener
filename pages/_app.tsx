@@ -6,8 +6,17 @@ import Navbar from "../components/Navbar/Navbar";
 import Footer from "../components/Footer/Footer";
 import { store } from "../store";
 import { Provider } from "react-redux";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const queryClient = new QueryClient();
+
   return (
     <>
       <Head>
@@ -15,20 +24,22 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/favicon.svg" />
       </Head>
       <Provider store={store}>
-        <UserProvider>
-          <div className="wrapper">
-            <div className="wrapper__header">
-              <Navbar />
-            </div>
+        <QueryClientProvider client={queryClient}>
+          <UserProvider>
+            <div className="wrapper">
+              <div className="wrapper__header">
+                <Navbar />
+              </div>
 
-            <div className="wrapper__content">
-              <Component {...pageProps} />
+              <div className="wrapper__content">
+                <Component {...pageProps} />
+              </div>
+              <div className="wrapper__footer">
+                <Footer />
+              </div>
             </div>
-            <div className="wrapper__footer">
-              <Footer />
-            </div>
-          </div>
-        </UserProvider>
+          </UserProvider>
+        </QueryClientProvider>
       </Provider>
     </>
   );

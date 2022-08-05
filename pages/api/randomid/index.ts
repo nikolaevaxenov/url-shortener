@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { customAlphabet } from "nanoid";
+import { getLink } from "../../../services/link";
 
 const nanoid = customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -8,10 +9,7 @@ const nanoid = customAlphabet(
 
 const getSafeRandomId = async () => {
   const safeId = nanoid();
-  const res = await fetch(`${process.env.APP_URL}/api/links/${safeId}`, {
-    method: "get",
-  });
-  const result = await res.json();
+  const result = await getLink(safeId, true);
 
   if (result !== null) {
     getSafeRandomId();
