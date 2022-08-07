@@ -4,12 +4,3 @@ export interface ResponseFuncs {
   PUT?: Function;
   DELETE?: Function;
 }
-
-export interface Link {
-  _id?: number;
-  username: string;
-  shortLink: string;
-  fullLink: string;
-  createdAt: string;
-  views: number;
-}

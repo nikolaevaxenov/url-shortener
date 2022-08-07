@@ -9,7 +9,7 @@ export const connect = async () => {
   console.log("Mongoose Connection Established");
 
   const LinkSchema = new mongoose.Schema({
-    username: {
+    userId: {
       type: String,
       default: "Guest",
     },
@@ -24,6 +24,10 @@ export const connect = async () => {
     views: {
       type: Number,
       default: 0,
+    },
+    password: {
+      type: String,
+      default: "",
     },
   });
 

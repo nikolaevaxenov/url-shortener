@@ -23,6 +23,7 @@ import {
   validateLink,
   EditLinkData,
 } from "../../services/link";
+import PasswordProtectedLinkForm from "../PasswordProtectedLinkForm/PasswordProtectedLinkForm";
 
 type LinkCardProps = {
   link: ILink;
@@ -190,6 +191,7 @@ export default function LinkCard({ link }: LinkCardProps) {
           Удалить <AiFillDelete />
         </button>
       </div>
+      <PasswordProtectedLinkForm link={link} />
       <ToastContainer
         position="bottom-center"
         autoClose={3000}

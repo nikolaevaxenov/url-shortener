@@ -25,9 +25,10 @@ const Home: NextPage = () => {
   const resultLink = useRef<HTMLInputElement>(null);
 
   const submitHandler = ({ fullLink }: FormData) => {
-    createLinkMutation.mutate(
-      user ? { fullLink, username: user?.email } : { fullLink }
-    );
+    createLinkMutation.mutate({
+      fullLink,
+      userId: user?.email ?? null,
+    });
   };
 
   const handleCopy = () => {
