@@ -5,6 +5,20 @@
   padding: 0.1rem 1rem;
   margin: 1rem;
 
+  &:hover {
+    background: darken(#f8f9fa, 5%);
+    cursor: pointer;
+  }
+
+  &__selected {
+    background: darken(#f8f9fa, 10%);
+
+    &:hover {
+      background: darken(#f8f9fa, 10%);
+      cursor: pointer;
+    }
+  }
+
   p {
     width: 100%;
 
@@ -33,10 +47,5 @@
       align-items: center;
       gap: 0.5rem;
     }
-  }
-
-  &:hover {
-    background: darken(#f8f9fa, 10%);
-    cursor: pointer;
   }
 }
