@@ -1,0 +1,57 @@
+@import "./colors.module.scss";
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h1 {
+    margin: 1rem;
+  }
+
+  form {
+    position: relative;
+    display: inline-block;
+
+    width: 20rem;
+
+    @media only screen and (min-width: 768px) {
+      width: 60%;
+    }
+  }
+
+  input {
+    background: lighten($navbar-bg, 10%);
+    border: 0;
+    border-radius: 10px;
+    margin-top: 0.8rem;
+    padding: 20px;
+    width: 100%;
+    color: $navbar-text;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $navbar-text;
+    }
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+
+    background: $title-color;
+    border: 0;
+    border-radius: 7px;
+    color: lighten($navbar-bg, 10%);
+    padding: 15px;
+    position: absolute;
+    right: 6px;
+    top: 37px;
+
+    cursor: pointer;
+  }
+}

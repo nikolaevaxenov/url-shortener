@@ -55,12 +55,13 @@ const Profile: NextPage<ProfileProps> = ({ user }) => {
       setLinkCard(
         <LinkCard
           link={
-            data.find((link: ILink) => link._id === idCard) ?? {
+            data?.find((link: ILink) => link._id === idCard) ?? {
               _id: "lorem",
               shortLink: "lorem",
               fullLink: "lorem",
               createdAt: "lorem",
               views: 123,
+              password: "",
             }
           }
         />

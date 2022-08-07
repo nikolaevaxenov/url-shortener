@@ -25,6 +25,10 @@ export const connect = async () => {
       type: Number,
       default: 0,
     },
+    password: {
+      type: String,
+      default: "",
+    },
   });
 
   const Link = mongoose.models.Link || mongoose.model("Link", LinkSchema);
