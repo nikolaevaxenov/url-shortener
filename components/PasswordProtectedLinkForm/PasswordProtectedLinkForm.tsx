@@ -44,7 +44,6 @@ export default function PasswordProtectedLinkForm({
     {
       onSuccess: (data, variables) => {
         setAddingPasswordState(false);
-        console.log("data", data, "variables", variables, "watch", watchPass1);
 
         toast.success(
           variables.oldPassword === ""
@@ -73,8 +72,6 @@ export default function PasswordProtectedLinkForm({
   );
 
   const onSubmit: SubmitHandler<FormInput> = (data) => {
-    console.log(data);
-
     setPasswordMutation.mutate({
       shortLink: link.shortLink,
       oldPassword: data?.oldPass ?? "",

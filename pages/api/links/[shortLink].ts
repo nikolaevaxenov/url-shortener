@@ -16,31 +16,49 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const link = await Link.findOne({ shortLink: shortLink }).catch(catcher);
 
-      if (link.password === "") {
-        res.json({ password: "", fullLink: link.fullLink });
+      if (link !== null) {
+        if (link.password === "") {
+          res.json({ password: "", fullLink: link.fullLink });
+        } else {
+          res.status(403).json({ shortLink });
+        }
       } else {
-        res.status(403).json({ shortLink });
+        res.status(404).json({});
       }
     },
     POST: async (req: NextApiRequest, res: NextApiResponse) => {
       const { Link } = await connect();
 
       const link = await Link.findOne({ shortLink: shortLink }).catch(catcher);
-      link.views = link.views + 1;
-      link.save().then(() => res.status(200).json({}));
+      if (link !== null) {
+        link.views = link.views + 1;
+        link.save().then(() => res.status(200).json({}));
+      } else {
+        res.status(404).json({});
+      }
     },
     PUT: withApiAuthRequired(
       async (req: NextApiRequest, res: NextApiResponse) => {
         const { Link } = await connect();
-        res.json(
-          await Link.findOneAndUpdate(
-            { shortLink: shortLink },
-            { shortLink: req.body.shortLink },
-            {
-              new: true,
-            }
-          ).catch(catcher)
-        );
+        const usedWords = ["profile"];
+
+        const checkId = await Link.exists({ shortLink: req.body.shortLink });
+
+        if (checkId || usedWords.includes(shortLink)) {
+          res
+            .status(409)
+            .json({ error: "Указанная короткая ссылка уже существует" });
+        } else {
+          res.json(
+            await Link.findOneAndUpdate(
+              { shortLink: shortLink },
+              { shortLink: req.body.shortLink },
+              {
+                new: true,
+              }
+            ).catch(catcher)
+          );
+        }
       }
     ),
     DELETE: withApiAuthRequired(

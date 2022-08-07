@@ -17,12 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useMutation } from "@tanstack/react-query";
-import {
-  deleteLink,
-  editLink,
-  validateLink,
-  EditLinkData,
-} from "../../services/link";
+import { deleteLink, editLink, EditLinkData } from "../../services/link";
 import PasswordProtectedLinkForm from "../PasswordProtectedLinkForm/PasswordProtectedLinkForm";
 
 type LinkCardProps = {
@@ -41,6 +36,7 @@ export default function LinkCard({ link }: LinkCardProps) {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm<FormInput>();
 
@@ -65,6 +61,22 @@ export default function LinkCard({ link }: LinkCardProps) {
       onSuccess: (data) => {
         dispatch(chooseCard(data._id));
         dispatch(editCard(false));
+
+        toast.success("Ссылка успешно изменена!", {
+          position: "bottom-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+      },
+      onError: (error: { message: string }) => {
+        setError("shortLink", {
+          type: "custom",
+          message: error.message,
+        });
       },
     }
   );
@@ -73,16 +85,6 @@ export default function LinkCard({ link }: LinkCardProps) {
     editLinkMutation.mutate({
       shortLink: link.shortLink,
       newShortLink: data.shortLink,
-    });
-
-    toast.success("Ссылка успешно изменена!", {
-      position: "bottom-center",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      progress: undefined,
     });
   };
 
@@ -112,7 +114,6 @@ export default function LinkCard({ link }: LinkCardProps) {
                   message:
                     "Ссылка должна содержать только цифры и латинские буквы",
                 },
-                validate: (newShortLink) => validateLink(newShortLink),
               })}
             />
 

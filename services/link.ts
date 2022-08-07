@@ -87,25 +87,10 @@ export const editLink = async (
     }
   );
 
-  return res.json();
-};
-
-export const validateLink = async (shortLink: string, ssr = false) => {
-  const usedWords = ["profile"];
-
-  const res = await fetch(
-    `${ssr ? process.env.APP_URL : ""}/api/links/${shortLink}`,
-    {
-      method: "get",
-    }
-  );
-
-  const result = await res.json();
-
-  if (usedWords.includes(shortLink) || result !== null) {
-    return "Указанная короткая ссылка уже существует";
+  if (!res.ok) {
+    throw new Error("Указанная короткая ссылка уже существует");
   } else {
-    return true;
+    return res.json();
   }
 };
 
