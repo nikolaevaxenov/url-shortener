@@ -71,12 +71,16 @@ export default function LinkCard({ link }: LinkCardProps) {
           draggable: true,
           progress: undefined,
         });
+
+        editLinkMutation.reset();
       },
       onError: (error: { message: string }) => {
         setError("shortLink", {
           type: "custom",
           message: error.message,
         });
+
+        editLinkMutation.reset();
       },
     }
   );
@@ -95,27 +99,30 @@ export default function LinkCard({ link }: LinkCardProps) {
         <span className={styles.wrapper__editLinkForm}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <p className={styles.wrapper__shortLink}>goshort.ga/</p>
-            <input
-              type="text"
-              placeholder="Ваша короткая ссылка"
-              defaultValue={link.shortLink}
-              {...register("shortLink", {
-                required: "Это обязательное поле",
-                minLength: {
-                  value: 6,
-                  message: "Минимальная длина ссылки 6 символов",
-                },
-                maxLength: {
-                  value: 20,
-                  message: "Максимальная длина ссылки 20 символов",
-                },
-                pattern: {
-                  value: /^[a-zA-Z0-9]+$/,
-                  message:
-                    "Ссылка должна содержать только цифры и латинские буквы",
-                },
-              })}
-            />
+            {editLinkMutation.isLoading && <p>Загрузка...</p>}
+            {editLinkMutation.isIdle && (
+              <input
+                type="text"
+                placeholder="Ваша короткая ссылка"
+                defaultValue={link.shortLink}
+                {...register("shortLink", {
+                  required: "Это обязательное поле",
+                  minLength: {
+                    value: 6,
+                    message: "Минимальная длина ссылки 6 символов",
+                  },
+                  maxLength: {
+                    value: 20,
+                    message: "Максимальная длина ссылки 20 символов",
+                  },
+                  pattern: {
+                    value: /^[a-zA-Z0-9]+$/,
+                    message:
+                      "Ссылка должна содержать только цифры и латинские буквы",
+                  },
+                })}
+              />
+            )}
 
             {errors.shortLink?.message && (
               <p className={styles.errors}>{errors.shortLink?.message}</p>
