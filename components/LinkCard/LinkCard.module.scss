@@ -8,6 +8,7 @@
 
 .wrapper {
   background: #f8f9fa;
+  max-width: 50rem;
 
   padding: 1rem;
   margin: 1rem;
@@ -113,7 +114,8 @@
 
   &__controls {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 2rem;
 
     button {
       background-color: #ffffff;

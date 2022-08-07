@@ -37,8 +37,6 @@ const Profile: NextPage<ProfileProps> = ({ user }) => {
   }, [refetch, editState]);
 
   useEffect(() => {
-    console.log("data", data);
-
     if (idCard === "deleted") {
       toast.error("Ссылка удалена!", {
         position: "bottom-center",

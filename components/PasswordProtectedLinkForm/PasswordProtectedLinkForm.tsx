@@ -44,7 +44,6 @@ export default function PasswordProtectedLinkForm({
     {
       onSuccess: (data, variables) => {
         setAddingPasswordState(false);
-        console.log("data", data, "variables", variables, "watch", watchPass1);
 
         toast.success(
           variables.oldPassword === ""
@@ -65,16 +64,16 @@ export default function PasswordProtectedLinkForm({
 
         link.password = watchPass1 ?? "";
         reset();
+        setPasswordMutation.reset();
       },
       onError: () => {
         setError("oldPass", { type: "custom", message: "Неверный пароль!" });
+        setPasswordMutation.reset();
       },
     }
   );
 
   const onSubmit: SubmitHandler<FormInput> = (data) => {
-    console.log(data);
-
     setPasswordMutation.mutate({
       shortLink: link.shortLink,
       oldPassword: data?.oldPass ?? "",
@@ -86,108 +85,113 @@ export default function PasswordProtectedLinkForm({
     <div className={styles.wrapper}>
       {addingPasswordState ? (
         <>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            {link.password !== "" && (
-              <>
-                <label htmlFor="oldPass">Введите старый пароль</label>
-                <input
-                  type="password"
-                  placeholder="Ваш старый пароль"
-                  {...register("oldPass", {
-                    required: "Это обязательное поле",
-                    minLength: {
-                      value: 6,
-                      message: "Минимальная длина пароля 6 символов",
-                    },
-                    maxLength: {
-                      value: 32,
-                      message: "Максимальная длина пароля 32 символа",
-                    },
-                    pattern: {
-                      value: /^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{6,32}$/,
-                      message:
-                        "Пароль должен содержать латинские буквы и как минимум одну цифру",
-                    },
-                  })}
-                />
-                {errors.oldPass?.message && (
-                  <p className={styles.errors}>{errors.oldPass?.message}</p>
-                )}
-              </>
-            )}
+          {setPasswordMutation.isLoading && <p>Загрузка...</p>}
+          {setPasswordMutation.isIdle && (
+            <form onSubmit={handleSubmit(onSubmit)}>
+              {link.password !== "" && (
+                <>
+                  <label htmlFor="oldPass">Введите старый пароль</label>
+                  <input
+                    type="password"
+                    placeholder="Ваш старый пароль"
+                    {...register("oldPass", {
+                      required: "Это обязательное поле",
+                      minLength: {
+                        value: 6,
+                        message: "Минимальная длина пароля 6 символов",
+                      },
+                      maxLength: {
+                        value: 32,
+                        message: "Максимальная длина пароля 32 символа",
+                      },
+                      pattern: {
+                        value: /^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{6,32}$/,
+                        message:
+                          "Пароль должен содержать латинские буквы и как минимум одну цифру",
+                      },
+                    })}
+                  />
+                  {errors.oldPass?.message && (
+                    <p className={styles.errors}>{errors.oldPass?.message}</p>
+                  )}
+                </>
+              )}
 
-            <label htmlFor="pass1">
-              Введите новый пароль
-              {link.password !== "" && " (Для удаления пароля оставьте пустым)"}
-            </label>
-            <input
-              type="password"
-              placeholder="Ваш новый пароль"
-              {...register("pass1", {
-                minLength: {
-                  value: 6,
-                  message: "Минимальная длина пароля 6 символов",
-                },
-                maxLength: {
-                  value: 32,
-                  message: "Максимальная длина пароля 32 символа",
-                },
-                pattern: {
-                  value: /^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{6,32}$/,
-                  message:
-                    "Пароль должен содержать латинские буквы и как минимум одну цифру",
-                },
-              })}
-            />
-            {errors.pass1?.message && (
-              <p className={styles.errors}>{errors.pass1?.message}</p>
-            )}
+              <label htmlFor="pass1">
+                Введите новый пароль
+                {link.password !== "" &&
+                  " (Для удаления пароля оставьте пустым)"}
+              </label>
+              <input
+                type="password"
+                placeholder="Ваш новый пароль"
+                {...register("pass1", {
+                  minLength: {
+                    value: 6,
+                    message: "Минимальная длина пароля 6 символов",
+                  },
+                  maxLength: {
+                    value: 32,
+                    message: "Максимальная длина пароля 32 символа",
+                  },
+                  pattern: {
+                    value: /^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{6,32}$/,
+                    message:
+                      "Пароль должен содержать латинские буквы и как минимум одну цифру",
+                  },
+                })}
+              />
+              {errors.pass1?.message && (
+                <p className={styles.errors}>{errors.pass1?.message}</p>
+              )}
 
-            <label htmlFor="pass2">
-              Подтвердите ваш пароль
-              {link.password !== "" && " (Для удаления пароля оставьте пустым)"}
-            </label>
-            <input
-              type="password"
-              placeholder="Подтвердите ваш пароль"
-              {...register("pass2", {
-                minLength: {
-                  value: 6,
-                  message: "Минимальная длина пароля 6 символов",
-                },
-                maxLength: {
-                  value: 32,
-                  message: "Максимальная длина пароля 32 символа",
-                },
-                pattern: {
-                  value: /^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{6,32}$/,
-                  message:
-                    "Пароль должен содержать латинские буквы и как минимум одну цифру",
-                },
-                validate: (password) =>
-                  password !== (watchPass1 ?? "")
-                    ? "Пароли должны совпадать!"
-                    : true,
-              })}
-            />
-            {errors.pass2?.message && (
-              <p className={styles.errors}>{errors.pass2?.message}</p>
-            )}
-            <div>
-              <button type="submit">
-                Сохранить <AiFillSave />
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setAddingPasswordState(false);
-                  reset();
-                }}
-              >
-                Отмена <AiOutlineClose />
-              </button>
-            </div>
-          </form>
+              <label htmlFor="pass2">
+                Подтвердите ваш пароль
+                {link.password !== "" &&
+                  " (Для удаления пароля оставьте пустым)"}
+              </label>
+              <input
+                type="password"
+                placeholder="Подтвердите ваш пароль"
+                {...register("pass2", {
+                  minLength: {
+                    value: 6,
+                    message: "Минимальная длина пароля 6 символов",
+                  },
+                  maxLength: {
+                    value: 32,
+                    message: "Максимальная длина пароля 32 символа",
+                  },
+                  pattern: {
+                    value: /^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{6,32}$/,
+                    message:
+                      "Пароль должен содержать латинские буквы и как минимум одну цифру",
+                  },
+                  validate: (password) =>
+                    password !== (watchPass1 ?? "")
+                      ? "Пароли должны совпадать!"
+                      : true,
+                })}
+              />
+              {errors.pass2?.message && (
+                <p className={styles.errors}>{errors.pass2?.message}</p>
+              )}
+              <div>
+                <button type="submit">
+                  Сохранить <AiFillSave />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddingPasswordState(false);
+                    reset();
+                  }}
+                >
+                  Отмена <AiOutlineClose />
+                </button>
+              </div>
+            </form>
+          )}
         </>
       ) : (
         <button type="button" onClick={() => setAddingPasswordState(true)}>

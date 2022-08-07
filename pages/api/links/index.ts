@@ -41,7 +41,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const { Link } = await connect();
 
       const safeId = await getSafeRandomId();
-      console.log(safeId);
       const currDate = new Date();
 
       res.json(
@@ -59,7 +58,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const session = getSession(req, res);
 
         const safeId = await getSafeRandomId();
-        console.log(safeId);
         const currDate = new Date();
 
         res.json(

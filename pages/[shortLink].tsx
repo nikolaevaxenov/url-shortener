@@ -48,9 +48,6 @@ const ShortLinkRedirect: NextPage<ShortLinkRedirectProps> = ({
   );
 
   const onSubmit: SubmitHandler<FormInput> = (data) => {
-    console.log(data);
-    console.log(link);
-
     setPasswordMutation.mutate({
       shortLink: link.shortLink,
       password: data.password,
