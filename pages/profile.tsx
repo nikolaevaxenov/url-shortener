@@ -24,9 +24,10 @@ const Profile: NextPage<ProfileProps> = ({ user }) => {
   const editState = useAppSelector((state) => state.card.editState);
   const dispatch = useAppDispatch();
   const router = useRouter();
+
   const { refetch, data, isLoading } = useQuery(
-    ["links", user.email as string],
-    () => getUserLinks(user.email as string)
+    ["links", user.user_id as string],
+    () => getUserLinks(user.user_id as string)
   );
 
   const [linkCard, setLinkCard] = useState(<></>);
@@ -36,6 +37,8 @@ const Profile: NextPage<ProfileProps> = ({ user }) => {
   }, [refetch, editState]);
 
   useEffect(() => {
+    console.log("data", data);
+
     if (idCard === "deleted") {
       toast.error("Ссылка удалена!", {
         position: "bottom-center",
@@ -79,8 +82,10 @@ const Profile: NextPage<ProfileProps> = ({ user }) => {
           <div>Загрузка...</div>
         ) : (
           <div className={styles.wrapper__leftSide}>
-            <p className={styles.wrapper__linkCount}>{data.length} ссылок</p>
-            {data.map((link: ILink) => (
+            <p className={styles.wrapper__linkCount}>
+              {data?.length ?? 0} ссылок
+            </p>
+            {data?.map((link: ILink) => (
               <div
                 className={styles.wrapper__linkCard}
                 key={link._id}

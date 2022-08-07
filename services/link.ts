@@ -31,19 +31,16 @@ export const getLink = async (shortLink: string, ssr = false) => {
 };
 
 export const getUserLinks = async (email: string, ssr = false) => {
-  const res = await fetch(
-    `${ssr ? process.env.APP_URL : ""}/api/links/user/${email}`,
-    {
-      method: "get",
-    }
-  );
+  const res = await fetch(`${ssr ? process.env.APP_URL : ""}/api/links`, {
+    method: "get",
+  });
 
   return res.json();
 };
 
 export const createLink = async (linkData: LinkData, ssr = false) => {
   const res = await fetch(`${ssr ? process.env.APP_URL : ""}/api/links`, {
-    method: "post",
+    method: linkData.username ? "put" : "post",
     headers: {
       "Content-Type": "application/json",
     },

@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { connect } from "../../../utils/connection";
 import { ResponseFuncs } from "../../../utils/types";
+import { withApiAuthRequired, getSession } from "@auth0/nextjs-auth0";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const method: keyof ResponseFuncs = req.method as keyof ResponseFuncs;
@@ -14,20 +15,28 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const { Link } = await connect();
       res.json(await Link.findOne({ shortLink: shortLink }).catch(catcher));
     },
-    PUT: async (req: NextApiRequest, res: NextApiResponse) => {
-      const { Link } = await connect();
-      res.json(
-        await Link.findOneAndUpdate({ shortLink: shortLink }, req.body, {
-          new: true,
-        }).catch(catcher)
-      );
-    },
-    DELETE: async (req: NextApiRequest, res: NextApiResponse) => {
-      const { Link } = await connect();
-      res.json(
-        await Link.findOneAndRemove({ shortLink: shortLink }).catch(catcher)
-      );
-    },
+    PUT: withApiAuthRequired(
+      async (req: NextApiRequest, res: NextApiResponse) => {
+        const { Link } = await connect();
+        res.json(
+          await Link.findOneAndUpdate(
+            { shortLink: shortLink },
+            { shortLink: req.body.shortLink },
+            {
+              new: true,
+            }
+          ).catch(catcher)
+        );
+      }
+    ),
+    DELETE: withApiAuthRequired(
+      async (req: NextApiRequest, res: NextApiResponse) => {
+        const { Link } = await connect();
+        res.json(
+          await Link.findOneAndRemove({ shortLink: shortLink }).catch(catcher)
+        );
+      }
+    ),
   };
 
   const response = handleCase[method];
