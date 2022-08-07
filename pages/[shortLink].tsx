@@ -33,10 +33,11 @@ const ShortLinkRedirect: NextPage<ShortLinkRedirectProps> = ({
     (checkPasswordOnLinkData: CheckPasswordOnLinkData) =>
       checkPasswordOnLink(checkPasswordOnLinkData),
     {
-      onSuccess: () => {
+      onSuccess: (data) => {
         setPasswordMutation.reset();
-
-        router.push(link.fullLink);
+        incrementViewsOnLink(link.shortLink as string).then(() =>
+          router.push(data.fullLink)
+        );
       },
       onError: () => {
         setPasswordMutation.reset();
@@ -48,6 +49,7 @@ const ShortLinkRedirect: NextPage<ShortLinkRedirectProps> = ({
 
   const onSubmit: SubmitHandler<FormInput> = (data) => {
     console.log(data);
+    console.log(link);
 
     setPasswordMutation.mutate({
       shortLink: link.shortLink,

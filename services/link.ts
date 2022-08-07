@@ -1,6 +1,6 @@
 export interface LinkData {
   fullLink: string;
-  username?: string | null;
+  userId?: string | null;
 }
 
 export interface EditLinkData {
@@ -40,7 +40,7 @@ export const getUserLinks = async (email: string, ssr = false) => {
 
 export const createLink = async (linkData: LinkData, ssr = false) => {
   const res = await fetch(`${ssr ? process.env.APP_URL : ""}/api/links`, {
-    method: linkData.username ? "put" : "post",
+    method: linkData.userId ? "put" : "post",
     headers: {
       "Content-Type": "application/json",
     },
@@ -51,17 +51,10 @@ export const createLink = async (linkData: LinkData, ssr = false) => {
 };
 
 export const incrementViewsOnLink = async (shortLink: string, ssr = false) => {
-  const resLink = await getLink(shortLink, ssr);
-  const currentViews = await resLink.views;
-
   const res = await fetch(
     `${ssr ? process.env.APP_URL : ""}/api/links/${shortLink}`,
     {
-      method: "put",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ views: currentViews + 1 }),
+      method: "post",
     }
   );
 

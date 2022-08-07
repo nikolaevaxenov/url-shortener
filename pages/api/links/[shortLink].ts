@@ -13,7 +13,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const handleCase: ResponseFuncs = {
     GET: async (req: NextApiRequest, res: NextApiResponse) => {
       const { Link } = await connect();
-      res.json(await Link.findOne({ shortLink: shortLink }).catch(catcher));
+
+      const link = await Link.findOne({ shortLink: shortLink }).catch(catcher);
+
+      if (link.password === "") {
+        res.json({ password: "", fullLink: link.fullLink });
+      } else {
+        res.status(403).json({ shortLink });
+      }
+    },
+    POST: async (req: NextApiRequest, res: NextApiResponse) => {
+      const { Link } = await connect();
+
+      const link = await Link.findOne({ shortLink: shortLink }).catch(catcher);
+      link.views = link.views + 1;
+      link.save().then(() => res.status(200).json({}));
     },
     PUT: withApiAuthRequired(
       async (req: NextApiRequest, res: NextApiResponse) => {

@@ -27,7 +27,7 @@ const Home: NextPage = () => {
   const submitHandler = ({ fullLink }: FormData) => {
     createLinkMutation.mutate({
       fullLink,
-      username: user?.email ?? null,
+      userId: user?.email ?? null,
     });
   };
 

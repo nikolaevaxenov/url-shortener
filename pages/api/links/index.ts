@@ -34,9 +34,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const { Link } = await connect();
         const session = getSession(req, res);
 
-        res.json(
-          await Link.find({ username: session?.user.sub }).catch(catcher)
-        );
+        res.json(await Link.find({ userId: session?.user.sub }).catch(catcher));
       }
     ),
     POST: async (req: NextApiRequest, res: NextApiResponse) => {
@@ -49,7 +47,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       res.json(
         await Link.create({
           fullLink: req.body.fullLink,
-          username: "Guest",
+          userId: "Guest",
           shortLink: safeId,
           createdAt: currDate,
         }).catch(catcher)
@@ -67,7 +65,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         res.json(
           await Link.create({
             fullLink: req.body.fullLink,
-            username: session?.user.sub,
+            userId: session?.user.sub,
             shortLink: safeId,
             createdAt: currDate,
           }).catch(catcher)
