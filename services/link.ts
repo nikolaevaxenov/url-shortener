@@ -88,7 +88,9 @@ export const editLink = async (
   );
 
   if (!res.ok) {
-    throw new Error("Указанная короткая ссылка уже существует");
+    const result = await res.json();
+
+    throw new Error(result.error);
   } else {
     return res.json();
   }

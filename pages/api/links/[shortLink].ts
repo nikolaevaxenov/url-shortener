@@ -40,33 +40,63 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     PUT: withApiAuthRequired(
       async (req: NextApiRequest, res: NextApiResponse) => {
         const { Link } = await connect();
+        const session = getSession(req, res);
+
         const usedWords = ["profile"];
 
-        const checkId = await Link.exists({ shortLink: req.body.shortLink });
+        const link = await Link.findOne({ shortLink: shortLink }).catch(
+          catcher
+        );
 
-        if (checkId || usedWords.includes(shortLink)) {
-          res
-            .status(409)
-            .json({ error: "Указанная короткая ссылка уже существует" });
+        if (link !== null) {
+          if (link.userId === session?.user.sub) {
+            const checkId = await Link.exists({
+              shortLink: req.body.shortLink,
+            });
+
+            if (checkId || usedWords.includes(shortLink)) {
+              res
+                .status(409)
+                .json({ error: "Указанная короткая ссылка уже существует" });
+            } else {
+              link.shortLink = req.body.shortLink;
+
+              link
+                .save()
+                .then((result: string) => res.status(200).json(result));
+            }
+          } else {
+            res
+              .status(403)
+              .json({ error: "Вы не владеете указанной короткой ссылкой" });
+          }
         } else {
-          res.json(
-            await Link.findOneAndUpdate(
-              { shortLink: shortLink },
-              { shortLink: req.body.shortLink },
-              {
-                new: true,
-              }
-            ).catch(catcher)
-          );
+          res.status(404).json(null);
         }
       }
     ),
     DELETE: withApiAuthRequired(
       async (req: NextApiRequest, res: NextApiResponse) => {
         const { Link } = await connect();
-        res.json(
-          await Link.findOneAndRemove({ shortLink: shortLink }).catch(catcher)
+        const session = getSession(req, res);
+
+        const link = await Link.findOne({ shortLink: shortLink }).catch(
+          catcher
         );
+
+        if (link !== null) {
+          if (link.userId === session?.user.sub) {
+            link
+              .remove()
+              .then((result: string) => res.status(200).json(result));
+          } else {
+            res
+              .status(403)
+              .json({ error: "Вы не владеете указанной короткой ссылкой" });
+          }
+        } else {
+          res.status(404).json(null);
+        }
       }
     ),
   };

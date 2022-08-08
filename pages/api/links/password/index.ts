@@ -14,68 +14,75 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     POST: withApiAuthRequired(
       async (req: NextApiRequest, res: NextApiResponse) => {
         const { Link } = await connect();
+        const session = getSession(req, res);
 
         const linkObj = await Link.findOne({ shortLink: req.body.shortLink });
 
         if (linkObj !== null) {
-          if (linkObj.password === "") {
-            if (req.body.password === "") {
-              linkObj.password = "";
-              linkObj
-                .save()
-                .then((result: string) => res.status(200).json(result));
-            } else {
-              bcrypt.hash(
-                req.body.password,
-                10,
-                function (err: string, hash: string) {
-                  linkObj.password = hash;
-                  linkObj
-                    .save()
-                    .then((result: string) => res.status(200).json(result));
-                }
-              );
-            }
-          } else {
-            if (req.body.password === "") {
-              bcrypt.compare(
-                req.body.oldPassword,
-                linkObj.password,
-                function (err: string, result: boolean) {
-                  if (result) {
-                    linkObj.password = "";
+          if (linkObj.userId === session?.user.sub) {
+            if (linkObj.password === "") {
+              if (req.body.password === "") {
+                linkObj.password = "";
+                linkObj
+                  .save()
+                  .then((result: string) => res.status(200).json(result));
+              } else {
+                bcrypt.hash(
+                  req.body.password,
+                  10,
+                  function (err: string, hash: string) {
+                    linkObj.password = hash;
                     linkObj
                       .save()
                       .then((result: string) => res.status(200).json(result));
-                  } else {
-                    res.status(403).json({});
                   }
-                }
-              );
+                );
+              }
             } else {
-              bcrypt.compare(
-                req.body.oldPassword,
-                linkObj.password,
-                function (err: string, result: boolean) {
-                  if (result) {
-                    bcrypt.hash(
-                      req.body.password,
-                      10,
-                      function (err: string, hash: string) {
-                        linkObj.password = hash;
-                        linkObj
-                          .save()
-                          .then((result: string) =>
-                            res.status(200).json(result)
-                          );
-                      }
-                    );
-                  } else {
-                    res.status(403).json({});
+              if (req.body.password === "") {
+                bcrypt.compare(
+                  req.body.oldPassword,
+                  linkObj.password,
+                  function (err: string, result: boolean) {
+                    if (result) {
+                      linkObj.password = "";
+                      linkObj
+                        .save()
+                        .then((result: string) => res.status(200).json(result));
+                    } else {
+                      res.status(403).json({});
+                    }
                   }
-                }
-              );
+                );
+              } else {
+                bcrypt.compare(
+                  req.body.oldPassword,
+                  linkObj.password,
+                  function (err: string, result: boolean) {
+                    if (result) {
+                      bcrypt.hash(
+                        req.body.password,
+                        10,
+                        function (err: string, hash: string) {
+                          linkObj.password = hash;
+                          linkObj
+                            .save()
+                            .then((result: string) =>
+                              res.status(200).json(result)
+                            );
+                        }
+                      );
+                    } else {
+                      res.status(403).json({});
+                    }
+                  }
+                );
+              }
             }
+          } else {
+            res
+              .status(403)
+              .json({ error: "Вы не владеете указанной короткой ссылкой" });
           }
         } else {
           res.status(404).json({});
