@@ -17,8 +17,17 @@
     overflow: auto;
   }
 
-  &__linkCount {
-    text-align: center;
+  &__counters {
+    display: flex;
+    justify-content: center;
+
+    gap: 1rem;
+
+    p {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
   }
 
   @media screen and (max-width: 768px) {
@@ -29,7 +38,7 @@
       flex-direction: row;
     }
 
-    &__linkCount {
+    &__counters {
       display: none;
     }
 

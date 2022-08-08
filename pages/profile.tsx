@@ -7,13 +7,14 @@ import LinkCard from "../components/LinkCard/LinkCard";
 import LinkMiniCard from "../components/LinkMiniCard/LinkMiniCard";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { chooseCard, editCard } from "../features/profileLinkCard/cardSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { getUserLinks } from "../services/link";
 import { UserData } from "auth0";
+import { AiFillEye } from "react-icons/ai";
 
 type ProfileProps = {
   user: UserData;
@@ -28,6 +29,12 @@ const Profile: NextPage<ProfileProps> = ({ user }) => {
   const { refetch, data, isLoading } = useQuery(
     ["links", user.user_id as string],
     () => getUserLinks(user.user_id as string)
+  );
+
+  const viewsCounterMemo = useMemo(
+    () =>
+      data?.reduce((sumViews: number, link: ILink) => sumViews + link.views, 0),
+    [data]
   );
 
   const [linkCard, setLinkCard] = useState(<></>);
@@ -80,9 +87,12 @@ const Profile: NextPage<ProfileProps> = ({ user }) => {
           <div>Загрузка...</div>
         ) : (
           <div className={styles.wrapper__leftSide}>
-            <p className={styles.wrapper__linkCount}>
-              {data?.length ?? 0} ссылок
-            </p>
+            <div className={styles.wrapper__counters}>
+              <p>{data?.length ?? 0} ссылок</p>
+              <p>
+                {viewsCounterMemo} <AiFillEye />
+              </p>
+            </div>
             {data?.map((link: ILink) => (
               <div
                 className={styles.wrapper__linkCard}
