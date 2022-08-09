@@ -9,7 +9,7 @@ import classnames from "classnames";
 import "animate.css";
 
 export default function Navbar() {
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
   const router = useRouter();
   const { t } = useTranslation("navbar");
   const selectRef = useRef<HTMLSelectElement>(null);
@@ -78,12 +78,12 @@ export default function Navbar() {
               <option value="ru">🇷🇺 Русский</option>
               <option value="en">🇺🇸 English</option>
             </select>
-            {user ? (
+            {isLoading ? (
+              t("loading")
+            ) : user ? (
               <>
                 <Link href="/profile">
-                  <div className={styles.profileLinks}>
-                    <a className={styles.navbar__link}>{user.email}</a>
-                  </div>
+                  <a className={styles.navbar__link}>{user.email}</a>
                 </Link>
                 <Link href="/api/auth/logout">
                   <a className={styles.navbar__link}>{t("exit")}</a>

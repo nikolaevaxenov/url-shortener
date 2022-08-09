@@ -1,19 +1,15 @@
 import "../styles/globals.scss";
 import Head from "next/head";
+import dynamic from "next/dynamic";
 import type { AppProps } from "next/app";
 import { UserProvider } from "@auth0/nextjs-auth0";
-import Navbar from "../components/Navbar/Navbar";
-import Footer from "../components/Footer/Footer";
 import { store } from "../store";
 import { Provider } from "react-redux";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { appWithTranslation } from "next-i18next";
+
+const Navbar = dynamic(() => import("../components/Navbar/Navbar"));
+const Footer = dynamic(() => import("../components/Footer/Footer"));
 
 function MyApp({ Component, pageProps }: AppProps) {
   const queryClient = new QueryClient();
