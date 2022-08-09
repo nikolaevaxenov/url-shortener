@@ -1,0 +1,12 @@
+{
+  "description": "link shortening service",
+  "form": {
+    "placeholder": "Paste your link here",
+    "buttonShorten": "Shorten",
+    "buttonCopy": "Copy",
+    "buttonReload": "Shorten new link",
+    "loading": "Loading..."
+  },
+  "bottomDescription": "You can change, delete, set your own urls for links by registering on the site",
+  "successCopyToast": "Link copied!"
+}

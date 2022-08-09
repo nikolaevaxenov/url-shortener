@@ -7,19 +7,24 @@ import LinkCard from "../components/LinkCard/LinkCard";
 import LinkMiniCard from "../components/LinkMiniCard/LinkMiniCard";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { chooseCard, editCard } from "../features/profileLinkCard/cardSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { getUserLinks } from "../services/link";
 import { UserData } from "auth0";
+import { AiFillEye } from "react-icons/ai";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 type ProfileProps = {
   user: UserData;
 };
 
 const Profile: NextPage<ProfileProps> = ({ user }) => {
+  const { t } = useTranslation("profile");
+
   const idCard = useAppSelector((state) => state.card.idCard);
   const editState = useAppSelector((state) => state.card.editState);
   const dispatch = useAppDispatch();
@@ -30,6 +35,12 @@ const Profile: NextPage<ProfileProps> = ({ user }) => {
     () => getUserLinks(user.user_id as string)
   );
 
+  const viewsCounterMemo = useMemo(
+    () =>
+      data?.reduce((sumViews: number, link: ILink) => sumViews + link.views, 0),
+    [data]
+  );
+
   const [linkCard, setLinkCard] = useState(<></>);
 
   useEffect(() => {
@@ -38,7 +49,7 @@ const Profile: NextPage<ProfileProps> = ({ user }) => {
 
   useEffect(() => {
     if (idCard === "deleted") {
-      toast.error("Ссылка удалена!", {
+      toast.error(t("linkDeletedToast"), {
         position: "bottom-center",
         autoClose: 3000,
         hideProgressBar: false,
@@ -68,21 +79,26 @@ const Profile: NextPage<ProfileProps> = ({ user }) => {
         />
       );
     }
-  }, [data, dispatch, idCard, refetch, router]);
+  }, [data, dispatch, idCard, refetch, router, t]);
 
   return (
     <>
       <Head>
-        <title>Личный кабинет</title>
+        <title>{t("title")}</title>
       </Head>
       <main className={styles.wrapper}>
         {isLoading ? (
-          <div>Загрузка...</div>
+          <div>{t("loading")}</div>
         ) : (
           <div className={styles.wrapper__leftSide}>
-            <p className={styles.wrapper__linkCount}>
-              {data?.length ?? 0} ссылок
-            </p>
+            <div className={styles.wrapper__counters}>
+              <p>
+                {data?.length ?? 0} {t("links")}
+              </p>
+              <p>
+                {viewsCounterMemo} <AiFillEye />
+              </p>
+            </div>
             {data?.map((link: ILink) => (
               <div
                 className={styles.wrapper__linkCard}
@@ -114,6 +130,20 @@ const Profile: NextPage<ProfileProps> = ({ user }) => {
   );
 };
 
-export const getServerSideProps = withPageAuthRequired();
+export const getServerSideProps = withPageAuthRequired({
+  returnTo: "/",
+  async getServerSideProps(ctx) {
+    return {
+      props: {
+        ...(await serverSideTranslations(ctx.locale as string, [
+          "profile",
+          "linkCard",
+          "passwordProtectedLinkForm",
+          "navbar",
+        ])),
+      },
+    };
+  },
+});
 
 export default Profile;

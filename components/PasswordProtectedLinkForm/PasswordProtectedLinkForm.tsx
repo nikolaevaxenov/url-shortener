@@ -7,6 +7,8 @@ import { setPasswordOnLink, SetPasswordOnLinkData } from "../../services/link";
 import styles from "./PasswordProtectedLinkForm.module.scss";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 type PasswordProtectedLinkFormProps = {
   link: ILink;
@@ -21,6 +23,9 @@ type FormInput = {
 export default function PasswordProtectedLinkForm({
   link,
 }: PasswordProtectedLinkFormProps) {
+  const { t } = useTranslation("passwordProtectedLinkForm");
+  const { locale } = useRouter();
+
   const [addingPasswordState, setAddingPasswordState] = useState(false);
   const {
     register,
@@ -47,10 +52,10 @@ export default function PasswordProtectedLinkForm({
 
         toast.success(
           variables.oldPassword === ""
-            ? "Пароль успешно добавлен!"
+            ? t("passwordAddedToast")
             : watchPass1 === undefined || ""
-            ? "Пароль успешно удален!"
-            : "Пароль успешно изменен!",
+            ? t("passwordDeletedToast")
+            : t("passwordEditedToast"),
           {
             position: "bottom-center",
             autoClose: 3000,
@@ -67,7 +72,7 @@ export default function PasswordProtectedLinkForm({
         setPasswordMutation.reset();
       },
       onError: () => {
-        setError("oldPass", { type: "custom", message: "Неверный пароль!" });
+        setError("oldPass", { type: "custom", message: t("wrongPassword") });
         setPasswordMutation.reset();
       },
     }
@@ -78,6 +83,7 @@ export default function PasswordProtectedLinkForm({
       shortLink: link.shortLink,
       oldPassword: data?.oldPass ?? "",
       password: data.pass2,
+      lang: locale,
     });
   };
 
@@ -85,29 +91,28 @@ export default function PasswordProtectedLinkForm({
     <div className={styles.wrapper}>
       {addingPasswordState ? (
         <>
-          {setPasswordMutation.isLoading && <p>Загрузка...</p>}
+          {setPasswordMutation.isLoading && <p>{t("loading")}</p>}
           {setPasswordMutation.isIdle && (
             <form onSubmit={handleSubmit(onSubmit)}>
               {link.password !== "" && (
                 <>
-                  <label htmlFor="oldPass">Введите старый пароль</label>
+                  <label htmlFor="oldPass">{t("form.enterOldPassword")}</label>
                   <input
                     type="password"
-                    placeholder="Ваш старый пароль"
+                    placeholder={t("form.oldPasswordPlaceholder")}
                     {...register("oldPass", {
-                      required: "Это обязательное поле",
+                      required: t("form.required"),
                       minLength: {
                         value: 6,
-                        message: "Минимальная длина пароля 6 символов",
+                        message: t("form.minLength"),
                       },
                       maxLength: {
                         value: 32,
-                        message: "Максимальная длина пароля 32 символа",
+                        message: t("form.maxLength"),
                       },
                       pattern: {
                         value: /^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{6,32}$/,
-                        message:
-                          "Пароль должен содержать латинские буквы и как минимум одну цифру",
+                        message: t("form.pattern"),
                       },
                     })}
                   />
@@ -118,26 +123,24 @@ export default function PasswordProtectedLinkForm({
               )}
 
               <label htmlFor="pass1">
-                Введите новый пароль
-                {link.password !== "" &&
-                  " (Для удаления пароля оставьте пустым)"}
+                {t("form.pass1Label")}
+                {link.password !== "" && t("form.forDeletionLeaveBlank")}
               </label>
               <input
                 type="password"
-                placeholder="Ваш новый пароль"
+                placeholder={t("form.pass1Placeholder")}
                 {...register("pass1", {
                   minLength: {
                     value: 6,
-                    message: "Минимальная длина пароля 6 символов",
+                    message: t("form.minLength"),
                   },
                   maxLength: {
                     value: 32,
-                    message: "Максимальная длина пароля 32 символа",
+                    message: t("form.maxLength"),
                   },
                   pattern: {
                     value: /^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{6,32}$/,
-                    message:
-                      "Пароль должен содержать латинские буквы и как минимум одну цифру",
+                    message: t("form.pattern"),
                   },
                 })}
               />
@@ -146,31 +149,27 @@ export default function PasswordProtectedLinkForm({
               )}
 
               <label htmlFor="pass2">
-                Подтвердите ваш пароль
-                {link.password !== "" &&
-                  " (Для удаления пароля оставьте пустым)"}
+                {t("form.pass2Label")}
+                {link.password !== "" && t("form.forDeletionLeaveBlank")}
               </label>
               <input
                 type="password"
-                placeholder="Подтвердите ваш пароль"
+                placeholder={t("form.pass2Placeholder")}
                 {...register("pass2", {
                   minLength: {
                     value: 6,
-                    message: "Минимальная длина пароля 6 символов",
+                    message: t("form.minLength"),
                   },
                   maxLength: {
                     value: 32,
-                    message: "Максимальная длина пароля 32 символа",
+                    message: t("form.maxLength"),
                   },
                   pattern: {
                     value: /^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{6,32}$/,
-                    message:
-                      "Пароль должен содержать латинские буквы и как минимум одну цифру",
+                    message: t("form.pattern"),
                   },
                   validate: (password) =>
-                    password !== (watchPass1 ?? "")
-                      ? "Пароли должны совпадать!"
-                      : true,
+                    password !== (watchPass1 ?? "") ? t("form.validate") : true,
                 })}
               />
               {errors.pass2?.message && (
@@ -178,7 +177,7 @@ export default function PasswordProtectedLinkForm({
               )}
               <div>
                 <button type="submit">
-                  Сохранить <AiFillSave />
+                  {t("form.saveButton")} <AiFillSave />
                 </button>
                 <button
                   type="button"
@@ -187,7 +186,7 @@ export default function PasswordProtectedLinkForm({
                     reset();
                   }}
                 >
-                  Отмена <AiOutlineClose />
+                  {t("form.cancelButton")} <AiOutlineClose />
                 </button>
               </div>
             </form>
@@ -196,8 +195,8 @@ export default function PasswordProtectedLinkForm({
       ) : (
         <button type="button" onClick={() => setAddingPasswordState(true)}>
           {link.password === ""
-            ? "Добавить пароль на ссылку"
-            : "Изменить/Удалить пароль на ссылку"}{" "}
+            ? t("addPasswordButton")
+            : t("editDeletePasswordButton")}{" "}
           <AiFillLock />
         </button>
       )}

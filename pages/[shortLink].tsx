@@ -8,6 +8,8 @@ import { checkPasswordOnLink, CheckPasswordOnLinkData } from "../services/link";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 type ShortLinkRedirectProps = {
   link: ILink;
@@ -20,6 +22,8 @@ type FormInput = {
 const ShortLinkRedirect: NextPage<ShortLinkRedirectProps> = ({
   link,
 }: ShortLinkRedirectProps) => {
+  const { t } = useTranslation("shortLink");
+
   const {
     register,
     handleSubmit,
@@ -42,7 +46,7 @@ const ShortLinkRedirect: NextPage<ShortLinkRedirectProps> = ({
       onError: () => {
         setPasswordMutation.reset();
 
-        setError("password", { type: "custom", message: "Неверный пароль!" });
+        setError("password", { type: "custom", message: t("wrongPassword") });
       },
     }
   );
@@ -57,30 +61,29 @@ const ShortLinkRedirect: NextPage<ShortLinkRedirectProps> = ({
   return (
     <>
       <Head>
-        <title>Переход по короткой ссылке</title>
+        <title>{t("title")}</title>
       </Head>
       <main className={styles.wrapper}>
-        <h1>Для перехода по ссылке необходимо ввести пароль</h1>
+        <h1>{t("header")}</h1>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <label htmlFor="password">Введите пароль</label>
+          <label htmlFor="password">{t("form.label")}</label>
           {setPasswordMutation.isIdle && (
             <input
               type="password"
-              placeholder="Ваш пароль"
+              placeholder={t("form.placeholder")}
               {...register("password", {
-                required: "Это обязательное поле",
+                required: t("form.required"),
                 minLength: {
                   value: 6,
-                  message: "Минимальная длина пароля 6 символов",
+                  message: t("form.minLength"),
                 },
                 maxLength: {
                   value: 32,
-                  message: "Максимальная длина пароля 32 символа",
+                  message: t("form.maxLength"),
                 },
                 pattern: {
                   value: /^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{6,32}$/,
-                  message:
-                    "Пароль должен содержать латинские буквы и как минимум одну цифру",
+                  message: t("form.pattern"),
                 },
               })}
             />
@@ -88,7 +91,7 @@ const ShortLinkRedirect: NextPage<ShortLinkRedirectProps> = ({
           {setPasswordMutation.isLoading && (
             <input
               type="text"
-              value="Загрузка"
+              value={t("form.loading")}
               name="password"
               id="password"
               readOnly
@@ -99,7 +102,7 @@ const ShortLinkRedirect: NextPage<ShortLinkRedirectProps> = ({
           )}
 
           <button type="submit">
-            Перейти <BsDoorOpenFill />
+            {t("form.follow")} <BsDoorOpenFill />
           </button>
         </form>
       </main>
@@ -128,6 +131,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return {
         props: {
           link: result,
+          ...(await serverSideTranslations(context.locale as string, [
+            "shortLink",
+            "navbar",
+          ])),
         },
       };
     }
