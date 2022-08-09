@@ -1,4 +1,5 @@
 {
   "exit": "Sign Out",
-  "loginRegister": "Sign In / Sign Up"
+  "loginRegister": "Sign In / Sign Up",
+  "loading": "Loading profile..."
 }
