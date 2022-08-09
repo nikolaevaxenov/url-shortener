@@ -7,6 +7,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const method: keyof ResponseFuncs = req.method as keyof ResponseFuncs;
 
   const catcher = (error: Error) => res.status(400).json({ error });
+  const lang = req.query.lang || "ru";
 
   const bcrypt = require("bcrypt");
 
@@ -80,9 +81,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               }
             }
           } else {
-            res
-              .status(403)
-              .json({ error: "Вы не владеете указанной короткой ссылкой" });
+            res.status(403).json({
+              error:
+                lang === "ru"
+                  ? "Вы не владеете указанной короткой ссылкой"
+                  : "You do not own the specified short link",
+            });
           }
         } else {
           res.status(404).json({});

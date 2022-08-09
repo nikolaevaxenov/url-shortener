@@ -17,8 +17,15 @@ import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useMutation } from "@tanstack/react-query";
-import { deleteLink, editLink, EditLinkData } from "../../services/link";
+import {
+  deleteLink,
+  DeleteLinkData,
+  editLink,
+  EditLinkData,
+} from "../../services/link";
 import PasswordProtectedLinkForm from "../PasswordProtectedLinkForm/PasswordProtectedLinkForm";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 type LinkCardProps = {
   link: ILink;
@@ -29,6 +36,9 @@ type FormInput = {
 };
 
 export default function LinkCard({ link }: LinkCardProps) {
+  const { t } = useTranslation("linkCard");
+  const { locale } = useRouter();
+
   const dispatch = useAppDispatch();
   const editCardState = useAppSelector((state) => state.card.editState);
 
@@ -47,7 +57,7 @@ export default function LinkCard({ link }: LinkCardProps) {
   }, [link, reset]);
 
   const deleteLinkMutation = useMutation(
-    (shortLink: string) => deleteLink(shortLink),
+    (deleteLinkData: DeleteLinkData) => deleteLink(deleteLinkData),
     {
       onSuccess: () => {
         dispatch(chooseCard("deleted"));
@@ -62,7 +72,7 @@ export default function LinkCard({ link }: LinkCardProps) {
         dispatch(chooseCard(data._id));
         dispatch(editCard(false));
 
-        toast.success("Ссылка успешно изменена!", {
+        toast.success(t("editLinkToast"), {
           position: "bottom-center",
           autoClose: 3000,
           hideProgressBar: false,
@@ -89,6 +99,7 @@ export default function LinkCard({ link }: LinkCardProps) {
     editLinkMutation.mutate({
       shortLink: link.shortLink,
       newShortLink: data.shortLink,
+      lang: locale,
     });
   };
 
@@ -99,26 +110,25 @@ export default function LinkCard({ link }: LinkCardProps) {
         <span className={styles.wrapper__editLinkForm}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <p className={styles.wrapper__shortLink}>goshort.ga/</p>
-            {editLinkMutation.isLoading && <p>Загрузка...</p>}
+            {editLinkMutation.isLoading && <p>{t("loading")}</p>}
             {editLinkMutation.isIdle && (
               <input
                 type="text"
-                placeholder="Ваша короткая ссылка"
+                placeholder={t("form.linkPlaceholder")}
                 defaultValue={link.shortLink}
                 {...register("shortLink", {
-                  required: "Это обязательное поле",
+                  required: t("form.required"),
                   minLength: {
                     value: 6,
-                    message: "Минимальная длина ссылки 6 символов",
+                    message: t("form.minLength"),
                   },
                   maxLength: {
                     value: 20,
-                    message: "Максимальная длина ссылки 20 символов",
+                    message: t("form.maxLength"),
                   },
                   pattern: {
                     value: /^[a-zA-Z0-9]+$/,
-                    message:
-                      "Ссылка должна содержать только цифры и латинские буквы",
+                    message: t("form.pattern"),
                   },
                 })}
               />
@@ -138,7 +148,7 @@ export default function LinkCard({ link }: LinkCardProps) {
             <CopyToClipboard
               text={`https://goshort.ga/${link.shortLink}`}
               onCopy={() =>
-                toast.success("Ссылка скопирована!", {
+                toast.success(t("copyLinkToast"), {
                   position: "bottom-center",
                   autoClose: 3000,
                   hideProgressBar: false,
@@ -171,14 +181,14 @@ export default function LinkCard({ link }: LinkCardProps) {
               className={styles.iconWithText}
               onClick={handleSubmit(onSubmit)}
             >
-              Сохранить <AiFillSave />
+              {t("form.saveButton")} <AiFillSave />
             </button>
             <button
               type="button"
               className={styles.iconWithText}
               onClick={() => dispatch(editCard(false))}
             >
-              Отмена <AiOutlineClose />
+              {t("form.cancelButton")} <AiOutlineClose />
             </button>
           </div>
         ) : (
@@ -187,16 +197,21 @@ export default function LinkCard({ link }: LinkCardProps) {
             type="button"
             onClick={() => dispatch(editCard(true))}
           >
-            Изменить короткую ссылку <AiFillEdit />
+            {t("form.editLinkButton")} <AiFillEdit />
           </button>
         )}
         <button
           type="button"
           id={styles.deleteBtn}
           className={styles.iconWithText}
-          onClick={() => deleteLinkMutation.mutate(link.shortLink)}
+          onClick={() =>
+            deleteLinkMutation.mutate({
+              shortLink: link.shortLink,
+              lang: locale,
+            })
+          }
         >
-          Удалить <AiFillDelete />
+          {t("form.deleteLinkButton")} <AiFillDelete />
         </button>
       </div>
       <PasswordProtectedLinkForm link={link} />

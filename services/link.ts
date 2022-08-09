@@ -3,15 +3,22 @@ export interface LinkData {
   userId?: string | null;
 }
 
+export interface DeleteLinkData {
+  shortLink: string;
+  lang?: string;
+}
+
 export interface EditLinkData {
   shortLink: string;
   newShortLink: string;
+  lang?: string;
 }
 
 export interface SetPasswordOnLinkData {
   shortLink: string;
   password: string;
   oldPassword?: string;
+  lang?: string;
 }
 
 export type CheckPasswordOnLinkData = Omit<
@@ -61,9 +68,14 @@ export const incrementViewsOnLink = async (shortLink: string, ssr = false) => {
   return res.json();
 };
 
-export const deleteLink = async (shortLink: string, ssr = false) => {
+export const deleteLink = async (
+  { shortLink, lang }: DeleteLinkData,
+  ssr = false
+) => {
   const res = await fetch(
-    `${ssr ? process.env.APP_URL : ""}/api/links/${shortLink}`,
+    `${ssr ? process.env.APP_URL : ""}/api/links/${shortLink}?lang=${
+      lang ?? "ru"
+    }`,
     {
       method: "delete",
     }
@@ -73,11 +85,13 @@ export const deleteLink = async (shortLink: string, ssr = false) => {
 };
 
 export const editLink = async (
-  { shortLink, newShortLink }: EditLinkData,
+  { shortLink, newShortLink, lang }: EditLinkData,
   ssr = false
 ) => {
   const res = await fetch(
-    `${ssr ? process.env.APP_URL : ""}/api/links/${shortLink}`,
+    `${ssr ? process.env.APP_URL : ""}/api/links/${shortLink}?lang=${
+      lang ?? "ru"
+    }`,
     {
       method: "put",
       headers: {
@@ -97,11 +111,11 @@ export const editLink = async (
 };
 
 export const setPasswordOnLink = async (
-  { shortLink, password, oldPassword }: SetPasswordOnLinkData,
+  { shortLink, password, oldPassword, lang }: SetPasswordOnLinkData,
   ssr = false
 ) => {
   const res = await fetch(
-    `${ssr ? process.env.APP_URL : ""}/api/links/password/`,
+    `${ssr ? process.env.APP_URL : ""}/api/links/password?lang=${lang ?? "ru"}`,
     {
       method: "post",
       headers: {

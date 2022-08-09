@@ -1,0 +1,16 @@
+{
+  "editLinkToast": "Link successfully edited!",
+  "loading": "Loading...",
+  "form": {
+    "linkPlaceholder": "Your short link",
+    "required": "This is a required field",
+    "minLength": "Minimum link length is 6 characters",
+    "maxLength": "Maximum link length is 20 characters",
+    "pattern": "The link must contain only numbers and latin letters",
+    "saveButton": "Save",
+    "cancelButton": "Cancel",
+    "editLinkButton": "Edit short link",
+    "deleteLinkButton": "Delete"
+  },
+  "copyLinkToast": "Link copied!"
+}

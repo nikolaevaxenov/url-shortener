@@ -1,0 +1,15 @@
+{
+  "title": "Following short link",
+  "wrongPassword": "Invalid password!",
+  "header": "You must enter a password to follow the link",
+  "form": {
+    "label": "Enter your password",
+    "placeholder": "Your password",
+    "required": "This is a required field",
+    "minLength": "Minimum password length is 6 characters",
+    "maxLength": "Maximum password length is 32 characters",
+    "pattern": "Password must contain latin letters and at least one number",
+    "loading": "Loading...",
+    "follow": "Follow"
+  }
+}

@@ -10,6 +10,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useMutation } from "@tanstack/react-query";
 import { createLink, LinkData } from "../services/link";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 type FormData = {
   fullLink: string;
@@ -17,6 +19,7 @@ type FormData = {
 
 const Home: NextPage = () => {
   const { user } = useUser();
+  const { t } = useTranslation("index");
   const { register, handleSubmit, reset } = useForm<FormData>();
   const createLinkMutation = useMutation((linkData: LinkData) =>
     createLink(linkData)
@@ -35,7 +38,7 @@ const Home: NextPage = () => {
     if (resultLink.current) {
       resultLink.current.select();
 
-      toast.success("Ссылка скопирована!", {
+      toast.success(t("successCopyToast"), {
         position: "bottom-center",
         autoClose: 3000,
         hideProgressBar: false,
@@ -54,19 +57,19 @@ const Home: NextPage = () => {
       </Head>
       <main className={styles.main}>
         <p className={styles.main__title}>GoShort</p>
-        <p className={styles.main__subText}>сервис сокращения ссылок</p>
+        <p className={styles.main__subText}>{t("description")}</p>
         {createLinkMutation.isIdle && (
           <div id="inputForm" className={styles.main__inputGroup}>
             <form onSubmit={handleSubmit(submitHandler)}>
               <input
                 type="url"
-                placeholder="Вставьте сюда вашу ссылку"
+                placeholder={t("form.placeholder")}
                 className={styles.main__urlInput}
                 required
                 {...register("fullLink")}
               />
               <button type="submit" className={styles.main__urlButton}>
-                Сократить
+                {t("form.buttonShorten")}
               </button>
             </form>
           </div>
@@ -75,7 +78,7 @@ const Home: NextPage = () => {
           <div className={styles.main__inputGroup}>
             <input
               readOnly
-              value="Загрузка..."
+              value={t("form.loading")}
               className={styles.main__urlInput}
             />
           </div>
@@ -96,7 +99,7 @@ const Home: NextPage = () => {
                 onCopy={() => handleCopy()}
               >
                 <button type="button" className={styles.main__urlButton}>
-                  Скопировать <AiOutlineCopy />
+                  {t("form.buttonCopy")} <AiOutlineCopy />
                 </button>
               </CopyToClipboard>
             </div>
@@ -108,15 +111,12 @@ const Home: NextPage = () => {
                 reset();
               }}
             >
-              Сократить новую ссылку <AiOutlineReload />
+              {t("form.buttonReload")} <AiOutlineReload />
             </button>
           </>
         )}
 
-        <p className={styles.main__adText}>
-          Вы можете изменять, удалять, задавать собственные адреса ссылкам
-          зарегистрировавшись на сайте
-        </p>
+        <p className={styles.main__adText}>{t("bottomDescription")}</p>
         <ToastContainer
           position="bottom-center"
           autoClose={5000}
@@ -132,5 +132,13 @@ const Home: NextPage = () => {
     </>
   );
 };
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["index", "navbar"])),
+    },
+  };
+}
 
 export default Home;

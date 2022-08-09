@@ -9,6 +9,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const catcher = (error: Error) => res.status(400).json({ error });
 
   const shortLink: string = req.query.shortLink as string;
+  const lang = req.query.lang || "ru";
 
   const handleCase: ResponseFuncs = {
     GET: async (req: NextApiRequest, res: NextApiResponse) => {
@@ -42,7 +43,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const { Link } = await connect();
         const session = getSession(req, res);
 
-        const usedWords = ["profile"];
+        const usedWords = ["profile", "api", "en", "ru"];
 
         const link = await Link.findOne({ shortLink: shortLink }).catch(
           catcher
@@ -55,9 +56,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             });
 
             if (checkId || usedWords.includes(shortLink)) {
-              res
-                .status(409)
-                .json({ error: "Указанная короткая ссылка уже существует" });
+              res.status(409).json({
+                error:
+                  lang === "ru"
+                    ? "Указанная короткая ссылка уже существует"
+                    : "The specified short link already exists",
+              });
             } else {
               link.shortLink = req.body.shortLink;
 
@@ -66,9 +70,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 .then((result: string) => res.status(200).json(result));
             }
           } else {
-            res
-              .status(403)
-              .json({ error: "Вы не владеете указанной короткой ссылкой" });
+            res.status(403).json({
+              error:
+                lang === "ru"
+                  ? "Вы не владеете указанной короткой ссылкой"
+                  : "You do not own the specified short link",
+            });
           }
         } else {
           res.status(404).json(null);
@@ -92,7 +99,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           } else {
             res
               .status(403)
-              .json({ error: "Вы не владеете указанной короткой ссылкой" });
+              .json({
+                error:
+                  lang === "ru"
+                    ? "Вы не владеете указанной короткой ссылкой"
+                    : "You do not own the specified short link",
+              });
           }
         } else {
           res.status(404).json(null);
