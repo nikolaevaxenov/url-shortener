@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useRef, useState, useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import { Turn as Hamburger } from "hamburger-react";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 import classnames from "classnames";
 import "animate.css";
 
@@ -15,40 +16,33 @@ export default function Navbar() {
   const selectRef = useRef<HTMLSelectElement>(null);
   const menuDivRef = useRef<HTMLDivElement>(null);
   const [isOpen, setOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia("(max-width: 768px)");
-    if (media.matches !== isMobile) {
-      setIsMobile(media.matches);
-    }
-    const listener = () => setIsMobile(media.matches);
-    window.addEventListener("resize", listener);
-    return () => window.removeEventListener("resize", listener);
-  }, [isMobile]);
-
-  useEffect(() => {
-    console.log("isMobile = ", isMobile);
-    if (menuDivRef.current) {
-      if (!isMobile) {
-        setOpen(false);
-        menuDivRef.current.style.display = "flex";
-        menuDivRef.current.style.opacity = "100";
-      } else {
-        if (isOpen) {
-          menuDivRef.current.style.display = "flex";
-        } else {
-          menuDivRef.current.style.opacity = "0";
-        }
-      }
-    }
-  }, [isMobile, isOpen]);
 
   const handleLocaleChange = () => {
     router.push(router.route, router.asPath, {
       locale: selectRef?.current?.value,
     });
   };
+
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  useEffect(() => {
+    if (menuDivRef.current) {
+      if (!isMobile) {
+        menuDivRef.current.style.display = "flex";
+      } else {
+        if (isOpen) {
+          menuDivRef.current.style.display = "flex";
+        } else {
+          const timer = setTimeout(() => {
+            if (menuDivRef.current) {
+              menuDivRef.current.style.display = "none";
+            }
+          }, 1000);
+          return () => clearTimeout(timer);
+        }
+      }
+    }
+  }, [isMobile, isOpen]);
 
   return (
     <header>
